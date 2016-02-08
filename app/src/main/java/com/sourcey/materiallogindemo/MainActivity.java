@@ -11,10 +11,15 @@ import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.apache.http.HttpEntity;
@@ -36,7 +41,9 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import butterknife.Bind;
 
@@ -46,8 +53,7 @@ public class MainActivity extends ActionBarActivity {
     Context context;
 
 
-    private HashMap hm1;
-
+    List<String> devicesByIp = new ArrayList<>();
 
     //@Bind(R.id.buttonScan) Button _scanButton;
 
@@ -96,6 +102,71 @@ public class MainActivity extends ActionBarActivity {
        // new HttpAsyncTask().execute("http://192.168.0.25/KHAN?");
 
         Log.d("Hashmap", hm.toString());
+
+
+    }
+    //Intended for debugging purposes only
+    public void printDevices(View view){
+
+
+        //select the linear layout defined in the xml
+        final LinearLayout lm = (LinearLayout) findViewById(R.id.linearLayoutMain);
+
+
+
+        for ( final String deviceIp : devicesByIp ){
+
+            Log.d("Devices by IP", deviceIp);
+
+            //Create the LL to add a text view and a button
+            LinearLayout ll = new LinearLayout(this);
+            ll.setOrientation(LinearLayout.HORIZONTAL);
+            ll.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+            ll.setGravity(Gravity.CENTER);
+
+
+            TextView tvIp = new TextView(this);
+            tvIp.setText(deviceIp);
+            tvIp.setGravity(Gravity.CENTER);
+
+            ll.addView(tvIp);
+
+
+            Button btnOn = new Button(this);
+            btnOn.setText("ON");
+
+
+            btnOn.setOnClickListener(new View.OnClickListener() {
+                                         @Override
+                                         public void onClick(View v) {
+                                             // put code on click operation
+                                             Log.d("Button Pressed ON", deviceIp);
+                                         }
+                                     }
+
+            );
+
+            ll.addView(btnOn);
+
+            Button btnOFF = new Button(this);
+            btnOFF.setText("OFF");
+
+
+            btnOFF.setOnClickListener(new View.OnClickListener() {
+                                         @Override
+                                         public void onClick(View v) {
+                                             // put code on click operation
+                                             Log.d("Button Pressed OFF", deviceIp);
+                                         }
+                                     }
+
+            );
+
+            ll.addView(btnOFF);
+
+            lm.addView(ll);
+
+        }
 
 
 
@@ -240,7 +311,8 @@ public class MainActivity extends ActionBarActivity {
 
 
                 //Toast.makeText(getBaseContext(), ipDevice, Toast.LENGTH_SHORT).show();
-                Log.d("IP ACCEPTED", ipAdd);
+                Log.d("IP ACCEPTED", parseIP(ipAdd));
+                devicesByIp.add(parseIP(ipAdd));
 
             }
 
@@ -265,6 +337,24 @@ public class MainActivity extends ActionBarActivity {
         return ret;
     }
 
+    private static String parseIP( String ipAddress){
+
+        char[] charArray = ipAddress.toCharArray();
+        int i =0;
+        for( int j=0; i< charArray.length;i++){
+
+            if(charArray[i]=='/'){
+                j++;
+                if (j==3){
+                    break;
+
+                }
+            }
+        }
+
+        return ipAddress.substring(0,i);
+
+    }
 
 
     @Override
