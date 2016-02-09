@@ -55,6 +55,7 @@ public class MainActivity extends ActionBarActivity {
 
     List<String> devicesByIp = new ArrayList<>();
 
+
     //@Bind(R.id.buttonScan) Button _scanButton;
 
     @Override
@@ -129,6 +130,7 @@ public class MainActivity extends ActionBarActivity {
             tvIp.setText(deviceIp);
             tvIp.setGravity(Gravity.CENTER);
 
+
             ll.addView(tvIp);
 
 
@@ -141,6 +143,7 @@ public class MainActivity extends ActionBarActivity {
                                          public void onClick(View v) {
                                              // put code on click operation
                                              Log.d("Button Pressed ON", deviceIp);
+                                             turnON(deviceIp);
                                          }
                                      }
 
@@ -152,11 +155,13 @@ public class MainActivity extends ActionBarActivity {
             btnOFF.setText("OFF");
 
 
+
             btnOFF.setOnClickListener(new View.OnClickListener() {
                                          @Override
                                          public void onClick(View v) {
                                              // put code on click operation
                                              Log.d("Button Pressed OFF", deviceIp);
+                                             turnOFF(deviceIp);
                                          }
                                      }
 
@@ -296,6 +301,7 @@ public class MainActivity extends ActionBarActivity {
         private String ipAdd;
 
 
+
         @Override
         protected String doInBackground(String... urls) {
 
@@ -307,6 +313,7 @@ public class MainActivity extends ActionBarActivity {
         protected void onPostExecute(String result) {
             //Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_LONG).show();
             //Toast.makeText(getBaseContext(), result, Toast.LENGTH_LONG).show();
+
             if(result.equals("ACCEPTED")){
 
 
@@ -314,6 +321,34 @@ public class MainActivity extends ActionBarActivity {
                 Log.d("IP ACCEPTED", parseIP(ipAdd));
                 devicesByIp.add(parseIP(ipAdd));
 
+            }
+
+
+        }
+    }
+
+
+
+    private class HttpTurnOnOff extends AsyncTask<String, Void, String> {
+
+        private String ipAdd;
+
+
+
+        @Override
+        protected String doInBackground(String... urls) {
+
+            ipAdd = urls[0];
+            return GET(urls[0]);
+        }
+        // onPostExecute displays the results of the AsyncTask.
+        @Override
+        protected void onPostExecute(String result) {
+            //Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_LONG).show();
+            //Toast.makeText(getBaseContext(), result, Toast.LENGTH_LONG).show();
+
+            if(result.equals("Changed to OFF")|| result.equals("Changed to ON")) {
+                Log.d("State", ipAdd + " " + result);
             }
 
 
@@ -355,6 +390,26 @@ public class MainActivity extends ActionBarActivity {
         return ipAddress.substring(0,i);
 
     }
+
+    public void turnON( String ip){
+
+        final String turnOnCommand = "/?State=ON";
+
+        new HttpTurnOnOff().execute(ip+turnOnCommand);
+
+
+    }
+
+
+    public void turnOFF( String ip){
+
+        final String turnOffCommand = "/?State=OFF";
+
+        new HttpTurnOnOff().execute(ip+turnOffCommand);
+
+
+    }
+
 
 
     @Override
