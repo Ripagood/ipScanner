@@ -54,8 +54,8 @@ public class MainActivity extends ActionBarActivity {
 
 
     List<String> devicesByIp = new ArrayList<>();
-
-
+    HashMap devices = new HashMap();
+    
     //@Bind(R.id.buttonScan) Button _scanButton;
 
     @Override
@@ -186,6 +186,8 @@ public class MainActivity extends ActionBarActivity {
         //long ipSubnet = ((long) ipSubnetInteger);
         //long ipBroadcast = ((long) ipBroadcastInteger);
         // Create a hash map
+        //
+
 
 
         HashMap hm = new HashMap();
@@ -216,7 +218,8 @@ public class MainActivity extends ActionBarActivity {
 
             urlDevice = longToIP(ipSubnet);
             Log.d("IP CHECKED", urlDevice);
-            new HttpAsyncTask().execute(urlDiscovery+urlDevice+urlCommand);
+            new HttpAsyncTask().execute(urlDiscovery + urlDevice + urlCommand);
+           // MakeRequestGet(urlDiscovery+urlDevice+urlCommand);
         }
 
 
@@ -226,6 +229,40 @@ public class MainActivity extends ActionBarActivity {
 
 
     }
+
+
+    private void MakeRequestGet( final String url ) {//send Http Post request to "http://url.com/b.c" in background  using AsyncTask
+
+
+
+        new AsyncTask<Void, Void, String>() {
+            private String ipAdd="";
+            protected String doInBackground(Void[] params) {
+                ipAdd=url;
+                String response = "";
+                try {
+                    response = new HttpRequest(url).prepare().sendAndReadString();
+                } catch (Exception e) {
+                    response = e.getMessage();
+                }
+                return response;
+            }
+
+            protected void onPostExecute(String result) {
+                //do something with response
+                if(result.equals("ACCEPTED")){
+
+
+                    //Toast.makeText(getBaseContext(), ipDevice, Toast.LENGTH_SHORT).show();
+                    Log.d("IP ACCEPTED", parseIP(ipAdd));
+                    devicesByIp.add(parseIP(ipAdd));
+
+                }
+
+            }
+        }.execute();
+    }
+
 
     private static int invertIP( int ipAdd){
 
@@ -289,12 +326,9 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public boolean isConnected(){
-        ConnectivityManager connMgr = (ConnectivityManager) getSystemService(this.CONNECTIVITY_SERVICE);
+        ConnectivityManager connMgr = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected())
-            return true;
-        else
-            return false;
+        return networkInfo != null && networkInfo.isConnected();
     }
     private class HttpAsyncTask extends AsyncTask<String, Void, String> {
 
@@ -434,3 +468,5 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 }
+
+
