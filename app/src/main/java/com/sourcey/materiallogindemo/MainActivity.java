@@ -53,8 +53,10 @@ public class MainActivity extends ActionBarActivity {
     Context context;
 
 
-    List<String> devicesByIp = new ArrayList<>();
+    List<String> devicesByIp = new ArrayList<>(5);
     HashMap devices = new HashMap();
+
+    String deviceIp;
     
     //@Bind(R.id.buttonScan) Button _scanButton;
 
@@ -114,7 +116,71 @@ public class MainActivity extends ActionBarActivity {
         final LinearLayout lm = (LinearLayout) findViewById(R.id.linearLayoutMain);
 
 
+        for(int i=0; i<devicesByIp.size();i++){
 
+            deviceIp=devicesByIp.get(i);
+
+            Log.d("Devices by IP", deviceIp);
+
+            //Create the LL to add a text view and a button
+            LinearLayout ll = new LinearLayout(this);
+            ll.setOrientation(LinearLayout.HORIZONTAL);
+            ll.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+            ll.setGravity(Gravity.CENTER);
+
+
+            TextView tvIp = new TextView(this);
+            tvIp.setText(deviceIp);
+            tvIp.setGravity(Gravity.CENTER);
+
+
+            ll.addView(tvIp);
+
+
+            Button btnOn = new Button(this);
+            btnOn.setText("ON");
+
+
+            btnOn.setOnClickListener(new View.OnClickListener() {
+                                         @Override
+                                         public void onClick(View v) {
+                                             // put code on click operation
+                                             Log.d("Button Pressed ON", deviceIp);
+                                             turnON(deviceIp);
+                                         }
+                                     }
+
+            );
+
+            ll.addView(btnOn);
+
+            Button btnOFF = new Button(this);
+            btnOFF.setText("OFF");
+
+
+
+            btnOFF.setOnClickListener(new View.OnClickListener() {
+                                          @Override
+                                          public void onClick(View v) {
+                                              // put code on click operation
+                                              Log.d("Button Pressed OFF", deviceIp);
+                                              turnOFF(deviceIp);
+                                          }
+                                      }
+
+            );
+
+            ll.addView(btnOFF);
+
+            lm.addView(ll);
+
+
+
+        }
+
+
+
+/*
         for ( final String deviceIp : devicesByIp ){
 
             Log.d("Devices by IP", deviceIp);
@@ -173,7 +239,7 @@ public class MainActivity extends ActionBarActivity {
 
         }
 
-
+*/
 
 
     }
@@ -289,7 +355,7 @@ public class MainActivity extends ActionBarActivity {
 
             // set the connection timeout value to .1 seconds
             final HttpParams httpParams = new BasicHttpParams();
-            HttpConnectionParams.setConnectionTimeout(httpParams, 500);
+            HttpConnectionParams.setConnectionTimeout(httpParams, 1000);
 
             // create HttpClient
             HttpClient httpclient = new DefaultHttpClient(httpParams);
