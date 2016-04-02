@@ -1,6 +1,8 @@
 package com.sourcey.materiallogindemo;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.DhcpInfo;
@@ -10,12 +12,14 @@ import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -44,19 +48,37 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.Bind;
 
 
 public class MainActivity extends ActionBarActivity {
 
+
+    //Time out for the HTTP request
+    //do not go under 500ms
+    static final int  TIME_OUT =  1000;
+
     Context context;
 
 
     List<String> devicesByIp = new ArrayList<>(5);
-    HashMap devices = new HashMap();
+    HashMap<String, String[]> devices = new HashMap<>();
 
     String deviceIp;
+    String deviceKey;
+    String deviceNickName;
+    String[] addresses= {"",""};
+
+
+    List<AsyncTask> deviceScanner = new ArrayList<>(10);
+
+
+
+    //variable to store names
+    private String m_Text = "";
+
     
     //@Bind(R.id.buttonScan) Button _scanButton;
 
@@ -73,12 +95,34 @@ public class MainActivity extends ActionBarActivity {
 
 
 
+
+
+
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
     }
 
     public void ScanDevices(View view){
-        /*
+        //pressing the button toggles the text and the function
+        final Button btn = (Button) findViewById(R.id.buttonScan);
+
+        if(btn.getText().equals("Stop Scan"))
+        {
+            //we must stop the async tasks
+            for( AsyncTask asyncTask: deviceScanner){
+
+                asyncTask.cancel(true);
+
+
+            }
+            btn.setText("Scan Devices");
+
+
+
+        }else// we must scan the devices
+        {
+            btn.setText("Stop Scan");
+            /*
         WifiManager wifiMan = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         WifiInfo wifiInf = wifiMan.getConnectionInfo();
         int ipAddress = wifiInf.getIpAddress();
@@ -86,25 +130,32 @@ public class MainActivity extends ActionBarActivity {
         toast.setText(ip);
         */
 
-        // Only works when NOT tethering
-        WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-
-        DhcpInfo dhcp = wifi.getDhcpInfo();
-
-        Log.d("IP",intToIP(dhcp.ipAddress));
-
-        //display network info
-        //Toast.makeText(getBaseContext(), intToIP(dhcp.ipAddress) , Toast.LENGTH_SHORT).show();
-        //Toast.makeText(getBaseContext(), intToIP(dhcp.netmask) , Toast.LENGTH_SHORT).show();
-        //Toast.makeText(getBaseContext(), intToIP(dhcp.ipAddress & dhcp.netmask) , Toast.LENGTH_SHORT).show();
-        //Toast.makeText(getBaseContext(), intToIP(~dhcp.netmask | (dhcp.ipAddress & dhcp.netmask)) , Toast.LENGTH_SHORT).show();
+            // Only works when NOT tethering
+            WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
 
 
-        HashMap hm = DeviceScan(dhcp.ipAddress & dhcp.netmask, ~dhcp.netmask | (dhcp.ipAddress & dhcp.netmask));
-        // call AsynTask to perform network operation on separate thread
-       // new HttpAsyncTask().execute("http://192.168.0.25/KHAN?");
+            DhcpInfo dhcp = wifi.getDhcpInfo();
 
-        Log.d("Hashmap", hm.toString());
+            Log.d("IP",intToIP(dhcp.ipAddress));
+
+            //display network info
+            //Toast.makeText(getBaseContext(), intToIP(dhcp.ipAddress) , Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getBaseContext(), intToIP(dhcp.netmask) , Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getBaseContext(), intToIP(dhcp.ipAddress & dhcp.netmask) , Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getBaseContext(), intToIP(~dhcp.netmask | (dhcp.ipAddress & dhcp.netmask)) , Toast.LENGTH_SHORT).show();
+
+
+            DeviceScan(dhcp.ipAddress & dhcp.netmask, ~dhcp.netmask | (dhcp.ipAddress & dhcp.netmask));
+            // call AsynTask to perform network operation on separate thread
+            // new HttpAsyncTask().execute("http://192.168.0.25/KHAN?");
+        }
+
+
+
+
+
+
+
 
 
     }
@@ -115,7 +166,85 @@ public class MainActivity extends ActionBarActivity {
         //select the linear layout defined in the xml
         final LinearLayout lm = (LinearLayout) findViewById(R.id.linearLayoutMain);
 
+        lm.removeAllViews();
 
+
+        for (Map.Entry<String, String[]> entry : devices.entrySet()) {
+            deviceIp = entry.getKey();
+            String value[] = entry.getValue();
+
+
+            //Create the LL to add a text view and a button
+            LinearLayout ll = new LinearLayout(this);
+            ll.setOrientation(LinearLayout.HORIZONTAL);
+            ll.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+            ll.setGravity(Gravity.CENTER);
+
+
+            Button btnChangeName = new Button(this);
+            btnChangeName.setText(deviceIp);
+
+
+
+            btnChangeName.setOnClickListener(new View.OnClickListener() {
+                                                 @Override
+                                                 public void onClick(View v) {
+                                                     // put code on click operation
+                                                     Log.d("Button PressedName", deviceIp);
+                                                     ChangeNameAlert(deviceIp);
+
+                                                 }
+                                             }
+
+            );
+
+            ll.addView(btnChangeName);
+
+
+            Button btnOn = new Button(this);
+            btnOn.setText("ON");
+
+
+            btnOn.setOnClickListener(new View.OnClickListener() {
+                                         @Override
+                                         public void onClick(View v) {
+                                             // put code on click operation
+                                             Log.d("Button Pressed ON", deviceIp);
+                                             turnON(deviceIp);
+                                         }
+                                     }
+
+            );
+
+            ll.addView(btnOn);
+
+            Button btnOFF = new Button(this);
+            btnOFF.setText("OFF");
+
+
+
+            btnOFF.setOnClickListener(new View.OnClickListener() {
+                                          @Override
+                                          public void onClick(View v) {
+                                              // put code on click operation
+                                              Log.d("Button Pressed OFF", deviceIp);
+                                              turnOFF(deviceIp);
+                                          }
+                                      }
+
+            );
+
+            ll.addView(btnOFF);
+
+
+
+
+            lm.addView(ll);
+
+        }
+
+
+/*
         for(int i=0; i<devicesByIp.size();i++){
 
             deviceIp=devicesByIp.get(i);
@@ -172,18 +301,46 @@ public class MainActivity extends ActionBarActivity {
 
             ll.addView(btnOFF);
 
+
+            Button btnChangeName = new Button(this);
+            btnChangeName.setText("Name");
+
+
+
+            btnChangeName.setOnClickListener(new View.OnClickListener() {
+                                          @Override
+                                          public void onClick(View v) {
+                                              // put code on click operation
+                                              Log.d("Button PressedName", deviceIp);
+                                              ChangeNameAlert(deviceIp);
+
+                                          }
+                                      }
+
+            );
+
+            ll.addView(btnChangeName);
+
             lm.addView(ll);
 
 
 
         }
 
+*/
+    }
 
+    private void printDevices2(){
 
-/*
-        for ( final String deviceIp : devicesByIp ){
+        //select the linear layout defined in the xml
+        final LinearLayout lm = (LinearLayout) findViewById(R.id.linearLayoutMain);
+        lm.removeAllViews();
 
-            Log.d("Devices by IP", deviceIp);
+        for (Map.Entry<String, String[]> entry : devices.entrySet()) {
+            deviceNickName = entry.getKey();
+            String value[] = entry.getValue();
+            deviceIp = value[0];
+            deviceKey = value[1];
 
             //Create the LL to add a text view and a button
             LinearLayout ll = new LinearLayout(this);
@@ -192,12 +349,24 @@ public class MainActivity extends ActionBarActivity {
             ll.setGravity(Gravity.CENTER);
 
 
-            TextView tvIp = new TextView(this);
-            tvIp.setText(deviceIp);
-            tvIp.setGravity(Gravity.CENTER);
+            Button btnChangeName = new Button(this);
+            btnChangeName.setText(deviceNickName);
 
 
-            ll.addView(tvIp);
+
+            btnChangeName.setOnClickListener(new View.OnClickListener() {
+                                                 @Override
+                                                 public void onClick(View v) {
+                                                     // put code on click operation
+                                                     Log.d("Button PressedName",deviceNickName);
+                                                     ChangeNameAlert(deviceNickName);
+
+                                                 }
+                                             }
+
+            );
+
+            ll.addView(btnChangeName);
 
 
             Button btnOn = new Button(this);
@@ -223,40 +392,86 @@ public class MainActivity extends ActionBarActivity {
 
 
             btnOFF.setOnClickListener(new View.OnClickListener() {
-                                         @Override
-                                         public void onClick(View v) {
-                                             // put code on click operation
-                                             Log.d("Button Pressed OFF", deviceIp);
-                                             turnOFF(deviceIp);
-                                         }
-                                     }
+                                          @Override
+                                          public void onClick(View v) {
+                                              // put code on click operation
+                                              Log.d("Button Pressed OFF", deviceIp);
+                                              turnOFF(deviceIp);
+                                          }
+                                      }
 
             );
 
             ll.addView(btnOFF);
 
+
+
+
             lm.addView(ll);
 
         }
 
-*/
+
+    }
 
 
+    private void ChangeNameAlert(final String device){
+
+
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Change Name");
+
+// Set up the input
+        final EditText input = new EditText(this);
+// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
+
+// Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                m_Text = input.getText().toString();
+                ChangeNameHashMap(m_Text, device);
+                printDevices2();
+
+
+
+
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+
+
+
+    }
+
+    private void ChangeNameHashMap(String NewKey, String OldKey){
+
+        devices.put(NewKey,devices.get(OldKey));
+        devices.remove(OldKey);
     }
 
     //receives the network ip address in order to find the devices
     // returns a hashmap containing ip adress of the device and an ID
    // public  HashMap DeviceScan(int ipSubnetInteger, int ipBroadcastInteger){
-        public  HashMap DeviceScan(int ipSubnet, int ipBroadcast){
+
+
+    private   void  DeviceScan(int ipSubnet, int ipBroadcast){
 
         //long ipSubnet = ((long) ipSubnetInteger);
         //long ipBroadcast = ((long) ipBroadcastInteger);
-        // Create a hash map
+        //
         //
 
-
-
-        HashMap hm = new HashMap();
         String urlDiscovery= "http://";
         String urlDevice = null;
         String urlCommand = "/KHAN?";
@@ -284,50 +499,15 @@ public class MainActivity extends ActionBarActivity {
 
             urlDevice = longToIP(ipSubnet);
             Log.d("IP CHECKED", urlDevice);
-            new HttpAsyncTask().execute(urlDiscovery + urlDevice + urlCommand);
+            deviceScanner.add(new HttpAsyncTask().execute(urlDiscovery + urlDevice + urlCommand));
+            //new HttpAsyncTask().execute(urlDiscovery + urlDevice + urlCommand);
            // MakeRequestGet(urlDiscovery+urlDevice+urlCommand);
         }
 
 
 
-
-        return hm;
-
-
     }
 
-
-    private void MakeRequestGet( final String url ) {//send Http Post request to "http://url.com/b.c" in background  using AsyncTask
-
-
-
-        new AsyncTask<Void, Void, String>() {
-            private String ipAdd="";
-            protected String doInBackground(Void[] params) {
-                ipAdd=url;
-                String response = "";
-                try {
-                    response = new HttpRequest(url).prepare().sendAndReadString();
-                } catch (Exception e) {
-                    response = e.getMessage();
-                }
-                return response;
-            }
-
-            protected void onPostExecute(String result) {
-                //do something with response
-                if(result.equals("ACCEPTED")){
-
-
-                    //Toast.makeText(getBaseContext(), ipDevice, Toast.LENGTH_SHORT).show();
-                    Log.d("IP ACCEPTED", parseIP(ipAdd));
-                    devicesByIp.add(parseIP(ipAdd));
-
-                }
-
-            }
-        }.execute();
-    }
 
 
     private static int invertIP( int ipAdd){
@@ -342,10 +522,6 @@ public class MainActivity extends ActionBarActivity {
 
         return ByteBuffer.wrap(hex).getInt();
 
-
-
-
-
     }
 
     public static String GET(String url){
@@ -355,7 +531,7 @@ public class MainActivity extends ActionBarActivity {
 
             // set the connection timeout value to .1 seconds
             final HttpParams httpParams = new BasicHttpParams();
-            HttpConnectionParams.setConnectionTimeout(httpParams, 1000);
+            HttpConnectionParams.setConnectionTimeout(httpParams, TIME_OUT);
 
             // create HttpClient
             HttpClient httpclient = new DefaultHttpClient(httpParams);
@@ -373,7 +549,8 @@ public class MainActivity extends ActionBarActivity {
                 result = "Did not work!";
 
         } catch (Exception e) {
-            Log.d("InputStream", e.getLocalizedMessage());
+            //Log.d("InputStream", e.getLocalizedMessage());
+            Log.d("InputStream", "NO connection");
         }
 
         return result;
@@ -391,17 +568,18 @@ public class MainActivity extends ActionBarActivity {
 
     }
 
-    public boolean isConnected(){
-        ConnectivityManager connMgr = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        return networkInfo != null && networkInfo.isConnected();
-    }
     private class HttpAsyncTask extends AsyncTask<String, Void, String> {
 
         private String ipAdd;
 
 
 
+        @Override
+        protected void onCancelled(){
+
+            //Do nothing?
+
+        }
         @Override
         protected String doInBackground(String... urls) {
 
@@ -416,10 +594,15 @@ public class MainActivity extends ActionBarActivity {
 
             if(result.equals("ACCEPTED")){
 
+                ipAdd = parseIP(ipAdd);
 
+                addresses[0]=ipAdd;
+                addresses[1]=ipAdd;
                 //Toast.makeText(getBaseContext(), ipDevice, Toast.LENGTH_SHORT).show();
-                Log.d("IP ACCEPTED", parseIP(ipAdd));
-                devicesByIp.add(parseIP(ipAdd));
+                Log.d("IP ACCEPTED", ipAdd);
+                devicesByIp.add(ipAdd);
+                devices.put(ipAdd,addresses);
+                printDevices2();
 
             }
 
