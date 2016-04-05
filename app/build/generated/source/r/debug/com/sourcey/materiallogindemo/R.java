@@ -2008,7 +2008,9 @@ containing a value of this type.
         public static final int snackbar_background=0x7f02003d;
     }
     public static final class id {
-        public static final int ButtonPrintDevices=0x7f0c006b;
+        public static final int ButtonConnection=0x7f0c006b;
+        public static final int LoadDevices=0x7f0c0081;
+        public static final int SaveDevices=0x7f0c0080;
         public static final int action0=0x7f0c0072;
         public static final int action_bar=0x7f0c0057;
         public static final int action_bar_activity_content=0x7f0c0000;

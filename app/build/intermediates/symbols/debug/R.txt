@@ -515,7 +515,9 @@ int drawable fab_background 0x7f02003b
 int drawable logo 0x7f02003c
 int drawable notification_template_icon_bg 0x7f02003e
 int drawable snackbar_background 0x7f02003d
-int id ButtonPrintDevices 0x7f0c006b
+int id ButtonConnection 0x7f0c006b
+int id LoadDevices 0x7f0c0081
+int id SaveDevices 0x7f0c0080
 int id action0 0x7f0c0072
 int id action_bar 0x7f0c0057
 int id action_bar_activity_content 0x7f0c0000

@@ -28,9 +28,14 @@ import android.widget.Toast;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
@@ -66,10 +71,17 @@ public class MainActivity extends ActionBarActivity {
     List<String> devicesByIp = new ArrayList<>(5);
     HashMap<String, String[]> devices = new HashMap<>();
 
+
     String deviceIp;
     String deviceKey;
     String deviceNickName;
     String[] addresses= {"",""};
+
+    String UserId="elias v";
+    String NumericUserId = "000002";
+    String serverURL = "http://khansystems.com/clienteQuery/index.php";
+
+    Boolean serverConnection = Boolean.FALSE;
 
 
     List<AsyncTask> deviceScanner = new ArrayList<>(10);
@@ -101,6 +113,9 @@ public class MainActivity extends ActionBarActivity {
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
     }
+
+
+
 
     public void ScanDevices(View view){
         //pressing the button toggles the text and the function
@@ -160,174 +175,23 @@ public class MainActivity extends ActionBarActivity {
 
     }
     //Intended for debugging purposes only
-    public void printDevices(View view){
+    public void Connection(View view){
+
+        //pressing the button toggles the text and the function
+        final Button btn = (Button) findViewById(R.id.ButtonConnection);
+
+        if(btn.getText().equals("Connect to Server"))
+        {
+            btn.setText("Disconnect");
+            serverConnection = Boolean.TRUE;
 
 
-        //select the linear layout defined in the xml
-        final LinearLayout lm = (LinearLayout) findViewById(R.id.linearLayoutMain);
-
-        lm.removeAllViews();
-
-
-        for (Map.Entry<String, String[]> entry : devices.entrySet()) {
-            deviceIp = entry.getKey();
-            String value[] = entry.getValue();
-
-
-            //Create the LL to add a text view and a button
-            LinearLayout ll = new LinearLayout(this);
-            ll.setOrientation(LinearLayout.HORIZONTAL);
-            ll.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-            ll.setGravity(Gravity.CENTER);
-
-
-            Button btnChangeName = new Button(this);
-            btnChangeName.setText(deviceIp);
-
-
-
-            btnChangeName.setOnClickListener(new View.OnClickListener() {
-                                                 @Override
-                                                 public void onClick(View v) {
-                                                     // put code on click operation
-                                                     Log.d("Button PressedName", deviceIp);
-                                                     ChangeNameAlert(deviceIp);
-
-                                                 }
-                                             }
-
-            );
-
-            ll.addView(btnChangeName);
-
-
-            Button btnOn = new Button(this);
-            btnOn.setText("ON");
-
-
-            btnOn.setOnClickListener(new View.OnClickListener() {
-                                         @Override
-                                         public void onClick(View v) {
-                                             // put code on click operation
-                                             Log.d("Button Pressed ON", deviceIp);
-                                             turnON(deviceIp);
-                                         }
-                                     }
-
-            );
-
-            ll.addView(btnOn);
-
-            Button btnOFF = new Button(this);
-            btnOFF.setText("OFF");
-
-
-
-            btnOFF.setOnClickListener(new View.OnClickListener() {
-                                          @Override
-                                          public void onClick(View v) {
-                                              // put code on click operation
-                                              Log.d("Button Pressed OFF", deviceIp);
-                                              turnOFF(deviceIp);
-                                          }
-                                      }
-
-            );
-
-            ll.addView(btnOFF);
-
-
-
-
-            lm.addView(ll);
-
+        }else
+        {
+            btn.setText("Connect to Server");
+            serverConnection = Boolean.FALSE;
         }
 
-
-/*
-        for(int i=0; i<devicesByIp.size();i++){
-
-            deviceIp=devicesByIp.get(i);
-
-            Log.d("Devices by IP", deviceIp);
-
-            //Create the LL to add a text view and a button
-            LinearLayout ll = new LinearLayout(this);
-            ll.setOrientation(LinearLayout.HORIZONTAL);
-            ll.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-            ll.setGravity(Gravity.CENTER);
-
-
-            TextView tvIp = new TextView(this);
-            tvIp.setText(deviceIp);
-            tvIp.setGravity(Gravity.CENTER);
-
-
-            ll.addView(tvIp);
-
-
-            Button btnOn = new Button(this);
-            btnOn.setText("ON");
-
-
-            btnOn.setOnClickListener(new View.OnClickListener() {
-                                         @Override
-                                         public void onClick(View v) {
-                                             // put code on click operation
-                                             Log.d("Button Pressed ON", deviceIp);
-                                             turnON(deviceIp);
-                                         }
-                                     }
-
-            );
-
-            ll.addView(btnOn);
-
-            Button btnOFF = new Button(this);
-            btnOFF.setText("OFF");
-
-
-
-            btnOFF.setOnClickListener(new View.OnClickListener() {
-                                          @Override
-                                          public void onClick(View v) {
-                                              // put code on click operation
-                                              Log.d("Button Pressed OFF", deviceIp);
-                                              turnOFF(deviceIp);
-                                          }
-                                      }
-
-            );
-
-            ll.addView(btnOFF);
-
-
-            Button btnChangeName = new Button(this);
-            btnChangeName.setText("Name");
-
-
-
-            btnChangeName.setOnClickListener(new View.OnClickListener() {
-                                          @Override
-                                          public void onClick(View v) {
-                                              // put code on click operation
-                                              Log.d("Button PressedName", deviceIp);
-                                              ChangeNameAlert(deviceIp);
-
-                                          }
-                                      }
-
-            );
-
-            ll.addView(btnChangeName);
-
-            lm.addView(ll);
-
-
-
-        }
-
-*/
     }
 
     private void printDevices2(){
@@ -340,8 +204,8 @@ public class MainActivity extends ActionBarActivity {
             deviceNickName = entry.getKey();
             String value[] = entry.getValue();
             deviceIp = value[0];
-            deviceKey = value[1];
-
+            //deviceKey = value[1];
+            deviceKey = "666";
             //Create the LL to add a text view and a button
             LinearLayout ll = new LinearLayout(this);
             ll.setOrientation(LinearLayout.HORIZONTAL);
@@ -378,7 +242,16 @@ public class MainActivity extends ActionBarActivity {
                                          public void onClick(View v) {
                                              // put code on click operation
                                              Log.d("Button Pressed ON", deviceIp);
-                                             turnON(deviceIp);
+
+                                             if (serverConnection == Boolean.TRUE ) {
+
+                                                 new HttpPOST_TurnON_OFF().execute(NumericUserId,deviceKey,"ON");
+
+                                             } else {
+
+                                                 turnON(deviceIp);
+                                             }
+
                                          }
                                      }
 
@@ -396,7 +269,14 @@ public class MainActivity extends ActionBarActivity {
                                           public void onClick(View v) {
                                               // put code on click operation
                                               Log.d("Button Pressed OFF", deviceIp);
-                                              turnOFF(deviceIp);
+                                              if (serverConnection == Boolean.TRUE) {
+
+                                                  new HttpPOST_TurnON_OFF().execute(NumericUserId, deviceKey, "OF");
+
+                                              } else {
+
+                                                  turnOFF(deviceIp);
+                                              }
                                           }
                                       }
 
@@ -404,10 +284,11 @@ public class MainActivity extends ActionBarActivity {
 
             ll.addView(btnOFF);
 
-
+            ll.setGravity(Gravity.CENTER);
 
 
             lm.addView(ll);
+            lm.setGravity(Gravity.CENTER);
 
         }
 
@@ -693,6 +574,155 @@ public class MainActivity extends ActionBarActivity {
 
     }
 
+    public void RegisterDevices( ){
+        String NickName;
+        String deviceKey;
+
+        for (Map.Entry<String, String[]> entry : devices.entrySet()) {
+            NickName = entry.getKey();
+            String value[] = entry.getValue();
+            //deviceIp = value[0];
+            deviceKey = value[1];
+            new HttpPOSTREGISTER().execute(NickName,deviceKey);
+
+        }
+
+
+    }
+
+    private String RegisterDevice( String NickName, String key){
+
+        String result="";
+
+        HttpClient httpClient = new DefaultHttpClient();
+        HttpPost httpPost = new HttpPost(serverURL);
+
+        List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(3);
+        nameValuePair.add(new BasicNameValuePair("AddDevice", key));
+        nameValuePair.add(new BasicNameValuePair("NickName", NickName));
+        nameValuePair.add(new BasicNameValuePair("User", UserId));
+
+        //Encoding POST data
+        try {
+            httpPost.setEntity(new UrlEncodedFormEntity(nameValuePair));
+
+        } catch (UnsupportedEncodingException e)
+        {
+            e.printStackTrace();
+        }
+
+        try {
+            HttpResponse response = httpClient.execute(httpPost);
+            // write response to log
+            result = response.toString();
+            Log.d("Http Post Response:", result);
+        } catch (ClientProtocolException e) {
+            // Log exception
+            e.printStackTrace();
+        } catch (IOException e) {
+            // Log exception
+            e.printStackTrace();
+        }
+
+        return  result;
+    }
+
+
+
+    private String POST_ON_OFF_Device( String userId, String key, String command){
+
+
+
+    //http://khansystems.com/clienteQuery/index.php?Update=000002999ON
+    //http://khansystems.com/clienteQuery/index.php?Update=000002999OF
+        String result="";
+
+        HttpClient httpClient = new DefaultHttpClient();
+        HttpPost httpPost = new HttpPost(serverURL);
+
+        List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(1);
+        nameValuePair.add(new BasicNameValuePair("Update", userId+key+command));
+
+
+        //Encoding POST data
+        try {
+            httpPost.setEntity(new UrlEncodedFormEntity(nameValuePair));
+
+        } catch (UnsupportedEncodingException e)
+        {
+            e.printStackTrace();
+        }
+
+        try {
+            HttpResponse response = httpClient.execute(httpPost);
+            // write response to log
+            result = response.toString();
+            Log.d("Http Post Response:", result);
+        } catch (ClientProtocolException e) {
+            // Log exception
+            e.printStackTrace();
+        } catch (IOException e) {
+            // Log exception
+            e.printStackTrace();
+        }
+
+        return  result;
+    }
+
+    private class HttpPOST_TurnON_OFF extends AsyncTask<String, Void, String> {
+
+        private String UserId;
+        private String key;
+        private String command; //ON OF
+
+
+
+        @Override
+        protected String doInBackground(String... urls) {
+
+            UserId = urls[0];
+            key = urls[1];
+            command = urls[2];
+            return POST_ON_OFF_Device(UserId, key,command);
+        }
+        // onPostExecute displays the results of the AsyncTask.
+        @Override
+        protected void onPostExecute(String result) {
+            //Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_LONG).show();
+            //Toast.makeText(getBaseContext(), result, Toast.LENGTH_LONG).show();
+
+
+        }
+    }
+
+
+    private class HttpPOSTREGISTER extends AsyncTask<String, Void, String> {
+
+        private String Nickname;
+        private String key;
+
+
+
+        @Override
+        protected String doInBackground(String... urls) {
+
+            Nickname = urls[0];
+            key = urls[1];
+            return RegisterDevice(Nickname, key);
+        }
+        // onPostExecute displays the results of the AsyncTask.
+        @Override
+        protected void onPostExecute(String result) {
+            //Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_LONG).show();
+            //Toast.makeText(getBaseContext(), result, Toast.LENGTH_LONG).show();
+
+
+        }
+    }
+
+
+
+
 
 
     @Override
@@ -707,14 +737,29 @@ public class MainActivity extends ActionBarActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
+
+        /*
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
+*/
+        switch (item.getItemId()) {
+            case R.id.SaveDevices:
+                Toast.makeText(getApplicationContext(),"Item 1 Selected",Toast.LENGTH_LONG).show();
+                RegisterDevices();
+                return true;
+            case R.id.LoadDevices:
+                Toast.makeText(getApplicationContext(),"Item 2 Selected",Toast.LENGTH_LONG).show();
+                return true;
+            case R.id.action_settings:
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
 
-        return super.onOptionsItemSelected(item);
     }
 }
 

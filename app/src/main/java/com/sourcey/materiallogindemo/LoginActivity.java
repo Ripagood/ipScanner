@@ -1,6 +1,8 @@
 package com.sourcey.materiallogindemo;
 
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -18,6 +20,7 @@ import butterknife.Bind;
 public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
     private static final int REQUEST_SIGNUP = 0;
+    private static final String PREFS_NAME = "USER_INFORMATION";
 
     @Bind(R.id.input_email) EditText _emailText;
     @Bind(R.id.input_password) EditText _passwordText;
@@ -47,6 +50,15 @@ public class LoginActivity extends AppCompatActivity {
                 startActivityForResult(intent, REQUEST_SIGNUP);
             }
         });
+
+        //restore previously used email and password
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, 0);
+        String email = prefs.getString("USER_ID", "");
+        String password = prefs.getString("PASSWORD","");
+
+        _emailText.setText(email);
+        _passwordText.setText(password);
+
     }
 
     public void login() {
@@ -70,6 +82,12 @@ public class LoginActivity extends AppCompatActivity {
 
         // TODO: Implement your own authentication logic here.
         // Need to add the remote server check
+
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("USER_ID", email);
+        editor.putString("PASSWORD", password);
+        editor.commit(); //important, otherwise it wouldn't save.
 
 
 
