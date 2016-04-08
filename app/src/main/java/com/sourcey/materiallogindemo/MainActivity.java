@@ -39,6 +39,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
+import org.apache.http.util.EntityUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -71,6 +72,7 @@ public class MainActivity extends ActionBarActivity {
     List<String> devicesByIp = new ArrayList<>(5);
     HashMap<String, String[]> devices = new HashMap<>();
 
+    // name: NIckName , value = ip, key
 
     String deviceIp;
     String deviceKey;
@@ -91,7 +93,7 @@ public class MainActivity extends ActionBarActivity {
     //variable to store names
     private String m_Text = "";
 
-    
+
     //@Bind(R.id.buttonScan) Button _scanButton;
 
     @Override
@@ -343,7 +345,7 @@ public class MainActivity extends ActionBarActivity {
 
     //receives the network ip address in order to find the devices
     // returns a hashmap containing ip adress of the device and an ID
-   // public  HashMap DeviceScan(int ipSubnetInteger, int ipBroadcastInteger){
+    // public  HashMap DeviceScan(int ipSubnetInteger, int ipBroadcastInteger){
 
 
     private   void  DeviceScan(int ipSubnet, int ipBroadcast){
@@ -363,13 +365,13 @@ public class MainActivity extends ActionBarActivity {
         //Log.d("IP CHECKED", longToIP(ipSubnet));
         //Log.d("IP CHECKED", longToIP(ipBroadcast));
 
-            Log.d("IP CHECKED", intToIP(ipSubnet));
-            Log.d("IP CHECKED", intToIP(ipBroadcast));
+        Log.d("IP CHECKED", intToIP(ipSubnet));
+        Log.d("IP CHECKED", intToIP(ipBroadcast));
 
 
 
 
-            //we scan every ip address for the devices until the broadcast address is reached
+        //we scan every ip address for the devices until the broadcast address is reached
 
 
         Log.d("IP CHECKED", intToIP(ipSubnet));
@@ -382,7 +384,7 @@ public class MainActivity extends ActionBarActivity {
             Log.d("IP CHECKED", urlDevice);
             deviceScanner.add(new HttpAsyncTask().execute(urlDiscovery + urlDevice + urlCommand));
             //new HttpAsyncTask().execute(urlDiscovery + urlDevice + urlCommand);
-           // MakeRequestGet(urlDiscovery+urlDevice+urlCommand);
+            // MakeRequestGet(urlDiscovery+urlDevice+urlCommand);
         }
 
 
@@ -430,8 +432,8 @@ public class MainActivity extends ActionBarActivity {
                 result = "Did not work!";
 
         } catch (Exception e) {
-            //Log.d("InputStream", e.getLocalizedMessage());
-            Log.d("InputStream", "NO connection");
+            Log.d("InputStream", e.getLocalizedMessage());
+            //Log.d("InputStream", "NO connection");
         }
 
         return result;
@@ -590,6 +592,74 @@ public class MainActivity extends ActionBarActivity {
 
     }
 
+    private String LoadDevices (String NumUserId){
+
+        // http://khansystems.com/clienteQuery/index.php?GetDevices=000002
+
+        String url;
+        String result="";
+
+        url = serverURL + "?GetDevices="+ NumUserId;
+        result = GET(url);
+
+
+
+        return  result;
+
+    }
+
+    //parses and sets the Devices from the http request
+    public void SetDevices( String UnparsedDevices){
+        String[] Devices = UnparsedDevices.split(";");
+        String[] params;
+
+        devices.clear();
+
+
+        for (int i= 0;i < Devices.length -1;i++){
+
+            params = Devices[i].split(",");
+            //Log.d("d", Integer.toString(params.length));
+
+            String nickname = params[1];
+            String key = params[0];
+            String ip = params[0];
+            String[] values = {ip,key};
+            devices.put(nickname, values);
+
+
+        }
+
+        printDevices2();
+
+
+    }
+
+
+    private class HttpPOST_LoadDevices extends AsyncTask<String, Void, String> {
+
+        private String NumUserId;
+
+        @Override
+        protected String doInBackground(String... urls) {
+
+            NumUserId = urls[0];
+
+            return LoadDevices(NumUserId);
+        }
+        // onPostExecute displays the results of the AsyncTask.
+        @Override
+        protected void onPostExecute(String result) {
+            Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_LONG).show();
+            //Toast.makeText(getBaseContext(), result, Toast.LENGTH_LONG).show();
+            Log.d("Http Post Response:", result);
+            SetDevices(result);
+
+
+
+        }
+    }
+
     private String RegisterDevice( String NickName, String key){
 
         String result="";
@@ -633,8 +703,8 @@ public class MainActivity extends ActionBarActivity {
 
 
 
-    //http://khansystems.com/clienteQuery/index.php?Update=000002999ON
-    //http://khansystems.com/clienteQuery/index.php?Update=000002999OF
+        //http://khansystems.com/clienteQuery/index.php?Update=000002999ON
+        //http://khansystems.com/clienteQuery/index.php?Update=000002999OF
         String result="";
 
         HttpClient httpClient = new DefaultHttpClient();
@@ -753,6 +823,7 @@ public class MainActivity extends ActionBarActivity {
                 return true;
             case R.id.LoadDevices:
                 Toast.makeText(getApplicationContext(),"Item 2 Selected",Toast.LENGTH_LONG).show();
+                new  HttpPOST_LoadDevices().execute(NumericUserId);
                 return true;
             case R.id.action_settings:
                 return true;
