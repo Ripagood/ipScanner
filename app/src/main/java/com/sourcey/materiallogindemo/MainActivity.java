@@ -12,6 +12,7 @@ import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Gravity;
@@ -21,8 +22,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -55,11 +58,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import butterknife.Bind;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends AppCompatActivity {
 
 
     //Time out for the HTTP request
@@ -87,6 +91,8 @@ public class MainActivity extends ActionBarActivity {
 
 
     List<AsyncTask> deviceScanner = new ArrayList<>(10);
+
+
 
 
 
@@ -199,6 +205,7 @@ public class MainActivity extends ActionBarActivity {
     private void printDevices2(){
 
         //select the linear layout defined in the xml
+
         final LinearLayout lm = (LinearLayout) findViewById(R.id.linearLayoutMain);
         lm.removeAllViews();
 
@@ -206,8 +213,8 @@ public class MainActivity extends ActionBarActivity {
             deviceNickName = entry.getKey();
             String value[] = entry.getValue();
             deviceIp = value[0];
-            //deviceKey = value[1];
-            deviceKey = "666";
+            deviceKey = value[1];
+            // deviceKey = "666";
             //Create the LL to add a text view and a button
             LinearLayout ll = new LinearLayout(this);
             ll.setOrientation(LinearLayout.HORIZONTAL);
@@ -215,7 +222,7 @@ public class MainActivity extends ActionBarActivity {
             ll.setGravity(Gravity.CENTER);
 
 
-            Button btnChangeName = new Button(this);
+            final Button btnChangeName = new Button(this);
             btnChangeName.setText(deviceNickName);
 
 
@@ -224,7 +231,7 @@ public class MainActivity extends ActionBarActivity {
                                                  @Override
                                                  public void onClick(View v) {
                                                      // put code on click operation
-                                                     Log.d("Button PressedName",deviceNickName);
+                                                     Log.d("Button PressedName", deviceNickName);
                                                      ChangeNameAlert(deviceNickName);
 
                                                  }
@@ -242,8 +249,10 @@ public class MainActivity extends ActionBarActivity {
             btnOn.setOnClickListener(new View.OnClickListener() {
                                          @Override
                                          public void onClick(View v) {
+                                             String[] arr = devices.get(btnChangeName.getText());
+                                             deviceKey = arr[1];
                                              // put code on click operation
-                                             Log.d("Button Pressed ON", deviceIp);
+                                             Log.d("Button Pressed ON", deviceKey);
 
                                              if (serverConnection == Boolean.TRUE ) {
 
@@ -269,8 +278,10 @@ public class MainActivity extends ActionBarActivity {
             btnOFF.setOnClickListener(new View.OnClickListener() {
                                           @Override
                                           public void onClick(View v) {
+                                              String[] arr = devices.get(btnChangeName.getText());
+                                              deviceKey = arr[1];
                                               // put code on click operation
-                                              Log.d("Button Pressed OFF", deviceIp);
+                                              Log.d("Button Pressed OFF", deviceKey);
                                               if (serverConnection == Boolean.TRUE) {
 
                                                   new HttpPOST_TurnON_OFF().execute(NumericUserId, deviceKey, "OF");
@@ -286,6 +297,62 @@ public class MainActivity extends ActionBarActivity {
 
             ll.addView(btnOFF);
 
+
+            final Button btnSettings = new Button(this);
+            btnSettings.setText(":");
+
+
+
+            btnSettings.setOnClickListener(new View.OnClickListener() {
+                                               @Override
+                                               public void onClick(View v) {
+                                                   String[] arr = devices.get(btnChangeName.getText());
+                                                   deviceKey = arr[1];
+                                                   // put code on click operation
+                                                   Log.d("Button Pressed OFF", deviceKey);
+                                                   //Creating the instance of PopupMenu
+                                                   PopupMenu popup = new PopupMenu(MainActivity.this, btnSettings);
+                                                   //Inflating the Popup using xml file
+                                                   popup.getMenuInflater().inflate(R.menu.popupmenu, popup.getMenu());
+
+                                                   //registering popup with OnMenuItemClickListener
+                                                   popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                                                       public boolean onMenuItemClick(MenuItem item) {
+                                                           //Toast.makeText(MainActivity.this,"You Clicked : " + deviceKey,Toast.LENGTH_SHORT).show();
+                                                           //return true;
+                                                           switch (item.getItemId()) {
+                                                               case R.id.Dimmer:
+                                                                   //Toast.makeText(getApplicationContext(),"Item 1 Selected",Toast.LENGTH_LONG).show();
+                                                                   //RegisterDevices();
+                                                                   ShowDialog(deviceKey);
+                                                                   return true;
+                                                               case R.id.Save:
+                                                                   //Toast.makeText(getApplicationContext(),"Item 2 Selected",Toast.LENGTH_LONG).show();
+                                                                   //new  HttpPOST_LoadDevices().execute(NumericUserId);
+                                                                   return true;
+                                                               case R.id.Delete:
+                                                                   //WipeDevices();
+                                                                   return true;
+
+                                                               case R.id.action_settings:
+                                                                   return true;
+                                                               default:
+                                                                   return true;
+                                                           }
+                                                       }
+                                                   });
+
+                                                   popup.show();//showing popup menu
+                                               }
+                                           }
+
+            );
+
+            ll.addView(btnSettings);
+
+
+
+
             ll.setGravity(Gravity.CENTER);
 
 
@@ -297,6 +364,51 @@ public class MainActivity extends ActionBarActivity {
 
     }
 
+
+    private void ShowDialog(String key)
+    {
+        final AlertDialog.Builder popDialog = new AlertDialog.Builder(this);
+        final SeekBar seek = new SeekBar(this);
+        seek.setMax(100);
+
+        popDialog.setIcon(android.R.drawable.btn_star_big_on);
+        popDialog.setTitle("Please Select "+ key);
+        popDialog.setView(seek);
+
+        seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
+                //Do something here with new value
+                //txtView.setText("Value of : " + progress);
+                //we must save the value for the seekbar on the hashmap and reload it
+
+            }
+
+            public void onStartTrackingTouch(SeekBar arg0) {
+                // TODO Auto-generated method stub
+
+            }
+
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                // TODO Auto-generated method stub
+
+            }
+        });
+
+
+        // Button OK
+        popDialog.setPositiveButton("OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+
+                });
+
+
+        popDialog.create();
+        popDialog.show();
+
+    }
 
     private void ChangeNameAlert(final String device){
 
@@ -455,6 +567,22 @@ public class MainActivity extends ActionBarActivity {
 
         private String ipAdd;
 
+        private String intToKey(int key){
+
+            String res="";
+
+            res= Integer.toString(key);
+
+            if(res.length()==1){
+                res= "00"+res;
+            }else if(res.length()==2){
+                res= "0"+res;
+            }
+
+            return res;
+
+        }
+
 
 
         @Override
@@ -479,8 +607,20 @@ public class MainActivity extends ActionBarActivity {
 
                 ipAdd = parseIP(ipAdd);
 
-                addresses[0]=ipAdd;
-                addresses[1]=ipAdd;
+                addresses[0]=ipAdd;//ipaddress
+
+                Random r = new Random();
+                int i1 = r.nextInt(999 - 0) + 0;
+
+                String convertedKey= intToKey(i1);
+
+                while(devices.containsValue(convertedKey)== Boolean.TRUE){
+
+                    i1 = r.nextInt(999 - 0) + 0;
+
+                    convertedKey= intToKey(i1);
+                }
+                addresses[1]=convertedKey;//devicekey assigned
                 //Toast.makeText(getBaseContext(), ipDevice, Toast.LENGTH_SHORT).show();
                 Log.d("IP ACCEPTED", ipAdd);
                 devicesByIp.add(ipAdd);
@@ -494,6 +634,31 @@ public class MainActivity extends ActionBarActivity {
     }
 
 
+    private class HttpWipe extends AsyncTask<String, Void, String> {
+
+
+
+
+
+        @Override
+        protected String doInBackground(String... urls) {
+
+
+            return GET(serverURL+urls[0]+urls[1]);
+        }
+        // onPostExecute displays the results of the AsyncTask.
+        @Override
+        protected void onPostExecute(String result) {
+            //Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_LONG).show();
+            //Toast.makeText(getBaseContext(), result, Toast.LENGTH_LONG).show();
+
+
+            Log.d("State", result);
+
+
+
+        }
+    }
 
     private class HttpTurnOnOff extends AsyncTask<String, Void, String> {
 
@@ -590,6 +755,27 @@ public class MainActivity extends ActionBarActivity {
         }
 
 
+    }
+
+    private void WipeDevices(){
+
+
+
+        for (Map.Entry<String, String[]> entry : devices.entrySet()) {
+            String NickName = entry.getKey();
+            String value[] = entry.getValue();
+            String key = value[1];
+            WipeDevice(key);
+
+        }
+
+    }
+
+    private void WipeDevice(String key){
+
+        //http://khansystems.com/clienteQuery/index.php?DeleteDevice=000002999
+
+        new HttpWipe().execute(NumericUserId,key);
     }
 
     private String LoadDevices (String NumUserId){
@@ -753,13 +939,14 @@ public class MainActivity extends ActionBarActivity {
             UserId = urls[0];
             key = urls[1];
             command = urls[2];
-            return POST_ON_OFF_Device(UserId, key,command);
+            return POST_ON_OFF_Device(UserId, key, command);
         }
         // onPostExecute displays the results of the AsyncTask.
         @Override
         protected void onPostExecute(String result) {
             //Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_LONG).show();
             //Toast.makeText(getBaseContext(), result, Toast.LENGTH_LONG).show();
+            Log.d("d",key);
 
 
         }
@@ -789,6 +976,7 @@ public class MainActivity extends ActionBarActivity {
 
         }
     }
+
 
 
 
@@ -825,6 +1013,10 @@ public class MainActivity extends ActionBarActivity {
                 Toast.makeText(getApplicationContext(),"Item 2 Selected",Toast.LENGTH_LONG).show();
                 new  HttpPOST_LoadDevices().execute(NumericUserId);
                 return true;
+            case R.id.WipeDevices:
+                WipeDevices();
+                return true;
+
             case R.id.action_settings:
                 return true;
             default:
