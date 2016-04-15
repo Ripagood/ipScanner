@@ -4,14 +4,14 @@
 
 
     <item
-        android:id="@+id/Dimmer"
+        android:id="@+id/PopUpDimmer"
         android:title="Dimmer"/>
 
     <item
-        android:id="@+id/Save"
-        android:title="Save"/>
+        android:id="@+id/PopUpOn"
+        android:title="On"/>
 
     <item
-        android:id="@+id/Delete"
-        android:title="Delete"/>
+        android:id="@+id/PopUpOff"
+        android:title="Off"/>
 </menu>

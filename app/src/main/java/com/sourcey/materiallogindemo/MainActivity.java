@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.DhcpInfo;
 import android.net.NetworkInfo;
@@ -45,9 +46,13 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
@@ -65,6 +70,8 @@ import butterknife.Bind;
 
 public class MainActivity extends AppCompatActivity {
 
+    //name of the saved used id var
+    private static final String PREFS_NAME = "USER_INFORMATION";
 
     //Time out for the HTTP request
     //do not go under 500ms
@@ -78,13 +85,15 @@ public class MainActivity extends AppCompatActivity {
 
     // name: NIckName , value = ip, key
 
+    Integer numericDC;
+    String deviceDutyCycle;
     String deviceIp;
     String deviceKey;
     String deviceNickName;
-    String[] addresses= {"",""};
-
+    String[] addresses= {"","",""};
+    //ip,key,dc
     String UserId="elias v";
-    String NumericUserId = "000002";
+    String NumericUserId;// = "000002";
     String serverURL = "http://khansystems.com/clienteQuery/index.php";
 
     Boolean serverConnection = Boolean.FALSE;
@@ -111,10 +120,16 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+//        NumericUserId =getIntent().getExtras().getString("NUMERIC_ID");
 
 
 
 
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, 0);
+        NumericUserId = prefs.getString("NUMERIC_ID", "");
+
+        loadHashMap();
+        printDevices2();
 
 
 
@@ -214,6 +229,7 @@ public class MainActivity extends AppCompatActivity {
             String value[] = entry.getValue();
             deviceIp = value[0];
             deviceKey = value[1];
+            deviceDutyCycle = value[2];
             // deviceKey = "666";
             //Create the LL to add a text view and a button
             LinearLayout ll = new LinearLayout(this);
@@ -231,8 +247,8 @@ public class MainActivity extends AppCompatActivity {
                                                  @Override
                                                  public void onClick(View v) {
                                                      // put code on click operation
-                                                     Log.d("Button PressedName", deviceNickName);
-                                                     ChangeNameAlert(deviceNickName);
+                                                     Log.d("Button PressedName", btnChangeName.getText().toString());
+                                                     ChangeNameAlert(btnChangeName.getText().toString());
 
                                                  }
                                              }
@@ -249,7 +265,7 @@ public class MainActivity extends AppCompatActivity {
             btnOn.setOnClickListener(new View.OnClickListener() {
                                          @Override
                                          public void onClick(View v) {
-                                             String[] arr = devices.get(btnChangeName.getText());
+                                             String[] arr = devices.get(btnChangeName.getText().toString());
                                              deviceKey = arr[1];
                                              // put code on click operation
                                              Log.d("Button Pressed ON", deviceKey);
@@ -278,7 +294,7 @@ public class MainActivity extends AppCompatActivity {
             btnOFF.setOnClickListener(new View.OnClickListener() {
                                           @Override
                                           public void onClick(View v) {
-                                              String[] arr = devices.get(btnChangeName.getText());
+                                              String[] arr = devices.get(btnChangeName.getText().toString());
                                               deviceKey = arr[1];
                                               // put code on click operation
                                               Log.d("Button Pressed OFF", deviceKey);
@@ -306,10 +322,11 @@ public class MainActivity extends AppCompatActivity {
             btnSettings.setOnClickListener(new View.OnClickListener() {
                                                @Override
                                                public void onClick(View v) {
-                                                   String[] arr = devices.get(btnChangeName.getText());
+                                                   String[] arr = devices.get(btnChangeName.getText().toString());
                                                    deviceKey = arr[1];
                                                    // put code on click operation
                                                    Log.d("Button Pressed OFF", deviceKey);
+                                                   Log.d("dc", arr[2]);
                                                    //Creating the instance of PopupMenu
                                                    PopupMenu popup = new PopupMenu(MainActivity.this, btnSettings);
                                                    //Inflating the Popup using xml file
@@ -321,17 +338,19 @@ public class MainActivity extends AppCompatActivity {
                                                            //Toast.makeText(MainActivity.this,"You Clicked : " + deviceKey,Toast.LENGTH_SHORT).show();
                                                            //return true;
                                                            switch (item.getItemId()) {
-                                                               case R.id.Dimmer:
+                                                               case R.id.PopUpDimmer:
                                                                    //Toast.makeText(getApplicationContext(),"Item 1 Selected",Toast.LENGTH_LONG).show();
                                                                    //RegisterDevices();
-                                                                   ShowDialog(deviceKey);
+                                                                   ShowDialog(btnChangeName.getText().toString());
                                                                    return true;
-                                                               case R.id.Save:
+                                                               case R.id.PopUpOn:
                                                                    //Toast.makeText(getApplicationContext(),"Item 2 Selected",Toast.LENGTH_LONG).show();
                                                                    //new  HttpPOST_LoadDevices().execute(NumericUserId);
+                                                                   PopUpOn(btnChangeName.getText().toString());
                                                                    return true;
-                                                               case R.id.Delete:
+                                                               case R.id.PopUpOff:
                                                                    //WipeDevices();
+                                                                   PopUpOFF(btnChangeName.getText().toString());
                                                                    return true;
 
                                                                case R.id.action_settings:
@@ -361,25 +380,70 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
+        //saveHashMap();
+
 
     }
 
+    private void PopUpOn (String key){
+
+        String[] arr = devices.get(key);
+        deviceKey = arr[1];
+        deviceIp = arr[0];
+        // put code on click operation
+        Log.d("Button Pressed ON", deviceKey);
+
+        if (serverConnection == Boolean.TRUE ) {
+
+            new HttpPOST_TurnON_OFF().execute(NumericUserId,deviceKey,"ON");
+
+        } else {
+
+            turnON(deviceIp);
+        }
+    }
+    private void PopUpOFF(String key){
+
+
+        String[] arr = devices.get(key);
+        deviceKey = arr[1];
+        deviceIp = arr[0];
+        // put code on click operation
+        Log.d("Button Pressed OFF", deviceKey);
+        if (serverConnection == Boolean.TRUE) {
+
+            new HttpPOST_TurnON_OFF().execute(NumericUserId, deviceKey, "OF");
+
+        } else {
+
+            turnOFF(deviceIp);
+        }
+
+
+
+    }
 
     private void ShowDialog(String key)
     {
         final AlertDialog.Builder popDialog = new AlertDialog.Builder(this);
         final SeekBar seek = new SeekBar(this);
         seek.setMax(100);
+        final String deviceK = key;
 
-        popDialog.setIcon(android.R.drawable.btn_star_big_on);
-        popDialog.setTitle("Please Select "+ key);
+        //popDialog.setIcon(android.R.drawable.btn_star_big_on);
+        // popDialog.setTitle("Please Select " + key);
         popDialog.setView(seek);
 
+        addresses = devices.get(key);
+        seek.incrementProgressBy(Integer.parseInt(addresses[2]));
+
+
         seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser){
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 //Do something here with new value
                 //txtView.setText("Value of : " + progress);
                 //we must save the value for the seekbar on the hashmap and reload it
+                numericDC = progress;
 
             }
 
@@ -390,6 +454,9 @@ public class MainActivity extends AppCompatActivity {
 
             public void onStopTrackingTouch(SeekBar seekBar) {
                 // TODO Auto-generated method stub
+                addresses = devices.get(deviceK);
+                addresses[2] = Integer.toString(numericDC);
+                //Log.d("length",Integer.toString(addresses.length));
 
             }
         });
@@ -410,10 +477,10 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void ChangeNameAlert(final String device){
+    private void ChangeNameAlert(String device){
 
 
-
+        deviceNickName = device;
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Change Name");
 
@@ -428,7 +495,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 m_Text = input.getText().toString();
-                ChangeNameHashMap(m_Text, device);
+                ChangeNameHashMap(m_Text, deviceNickName);
                 printDevices2();
 
 
@@ -451,8 +518,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void ChangeNameHashMap(String NewKey, String OldKey){
 
-        devices.put(NewKey,devices.get(OldKey));
+        devices.put(NewKey, devices.get(OldKey));
         devices.remove(OldKey);
+        saveHashMap();
     }
 
     //receives the network ip address in order to find the devices
@@ -759,7 +827,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void WipeDevices(){
 
-
+        //Deletes the device from the server
 
         for (Map.Entry<String, String[]> entry : devices.entrySet()) {
             String NickName = entry.getKey();
@@ -810,13 +878,18 @@ public class MainActivity extends AppCompatActivity {
             String nickname = params[1];
             String key = params[0];
             String ip = params[0];
-            String[] values = {ip,key};
+            String dc = "100";
+            String[] values = {ip,key,dc};
             devices.put(nickname, values);
 
 
         }
+        //Log.d("hs",devices.toString());
 
         printDevices2();
+
+        //Log.d("hs", devices.toString());
+        saveHashMap();
 
 
     }
@@ -946,7 +1019,7 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String result) {
             //Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_LONG).show();
             //Toast.makeText(getBaseContext(), result, Toast.LENGTH_LONG).show();
-            Log.d("d",key);
+            Log.d("d","https POST " +key);
 
 
         }
@@ -978,6 +1051,56 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    private void WipeSettings(){
+
+
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.clear();
+        editor.commit(); //important, otherwise it wouldn't save.
+
+    }
+
+    public void deleteHashMap(){
+
+        deleteFile("hs.bin");
+
+    }
+    public void saveHashMap(){
+
+        try {
+
+
+            FileOutputStream fileOutputStream = openFileOutput("hs.bin",Context.MODE_PRIVATE);
+            ObjectOutputStream objectOutputStream= new ObjectOutputStream(fileOutputStream);
+            objectOutputStream.writeObject(devices);
+            objectOutputStream.close();
+        }
+        catch(IOException e){
+            e.printStackTrace();
+        }
+
+    }
+
+    public void loadHashMap(){
+
+
+        try {
+            FileInputStream fileInputStream = openFileInput("hs.bin");
+            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+
+            devices = (HashMap) objectInputStream.readObject();
+            objectInputStream.close();
+        }
+        catch( IOException e){
+            e.printStackTrace();
+
+        }
+        catch (ClassNotFoundException e){
+            e.printStackTrace();
+        }
+    }
+
 
 
 
@@ -1006,18 +1129,22 @@ public class MainActivity extends AppCompatActivity {
 */
         switch (item.getItemId()) {
             case R.id.SaveDevices:
-                Toast.makeText(getApplicationContext(),"Item 1 Selected",Toast.LENGTH_LONG).show();
+                //Toast.makeText(getApplicationContext(),"Item 1 Selected",Toast.LENGTH_LONG).show();
                 RegisterDevices();
                 return true;
             case R.id.LoadDevices:
-                Toast.makeText(getApplicationContext(),"Item 2 Selected",Toast.LENGTH_LONG).show();
+                //Toast.makeText(getApplicationContext(),"Item 2 Selected",Toast.LENGTH_LONG).show();
                 new  HttpPOST_LoadDevices().execute(NumericUserId);
                 return true;
             case R.id.WipeDevices:
                 WipeDevices();
+                //DELETE DEVICES FROM SERVER
                 return true;
 
             case R.id.action_settings:
+                //DELETES LOCAL SETTINGS
+                //WipeSettings();
+                deleteHashMap();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
