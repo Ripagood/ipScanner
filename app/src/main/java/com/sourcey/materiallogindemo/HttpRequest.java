@@ -66,6 +66,7 @@ public class HttpRequest {
         if(isPost)con.setRequestMethod("POST");
         con.setDoOutput(true);
         con.setDoInput(true);
+        con.setConnectTimeout(1000);
         os = con.getOutputStream();
     }
     //prepare request in GET method

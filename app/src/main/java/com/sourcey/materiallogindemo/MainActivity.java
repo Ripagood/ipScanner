@@ -56,6 +56,8 @@ import java.io.ObjectOutputStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.ByteBuffer;
@@ -94,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
     //ip,key,dc
     String UserId="elias v";
     String NumericUserId;// = "000002";
-    String serverURL = "http://khansystems.com/clienteQuery/index.php";
+    final String serverURL = "http://khansystems.com/clienteQuery/index.php";
 
     Boolean serverConnection = Boolean.FALSE;
 
@@ -431,7 +433,7 @@ public class MainActivity extends AppCompatActivity {
         final String deviceK = key;
 
         //popDialog.setIcon(android.R.drawable.btn_star_big_on);
-        // popDialog.setTitle("Please Select " + key);
+        popDialog.setTitle("Select Intensity");
         popDialog.setView(seek);
 
         addresses = devices.get(key);
@@ -587,6 +589,33 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private String GET(String url){
+
+        String response="";
+
+        try{
+            //Consider next request:
+            HttpRequest req=new HttpRequest(url);
+            // prepare http get request,  send to "http://host:port/path" and read server's response as String
+            response=  req.prepare().sendAndReadString();
+        }
+        catch(MalformedURLException e){
+            response=e.getLocalizedMessage();
+            Log.d("MalformedURl",response);
+        }
+        catch (SocketTimeoutException e){
+            response=e.getLocalizedMessage();
+            Log.d("Connection timed out", response);
+        }
+        catch(IOException e){
+            response = e.getLocalizedMessage();
+            Log.d("IOException",response);
+        }
+        return  response;
+
+    }
+
+    /*
     public static String GET(String url){
         InputStream inputStream = null;
         String result = "";
@@ -618,6 +647,7 @@ public class MainActivity extends AppCompatActivity {
 
         return result;
     }
+    */
 
     private static String convertInputStreamToString(InputStream inputStream) throws IOException{
         BufferedReader bufferedReader = new BufferedReader( new InputStreamReader(inputStream));
@@ -818,7 +848,7 @@ public class MainActivity extends AppCompatActivity {
             String value[] = entry.getValue();
             //deviceIp = value[0];
             deviceKey = value[1];
-            new HttpPOSTREGISTER().execute(NickName,deviceKey);
+            new HttpPOSTREGISTER().execute(NickName, deviceKey);
 
         }
 
@@ -919,6 +949,34 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
+    private String RegisterDevice(String NickName, String key){
+
+
+        String result="";
+        try {
+            HttpRequest req = new HttpRequest(serverURL);
+            HashMap<String, String> params = new HashMap<>();
+            params.put("AddDevice", key);
+            params.put("NickName", NickName);
+            params.put("User", UserId);
+            result=req.preparePost().withData(params).sendAndReadString();
+        }
+        catch( SocketTimeoutException e){
+            Log.d("ConnectionTimeOut",e.getLocalizedMessage());
+
+        }
+        catch(MalformedURLException e){
+            Log.d("MalformedURl",e.getLocalizedMessage());
+        }
+        catch(IOException e){
+            Log.d("IO",e.getLocalizedMessage());
+        }
+        Log.d("Http Post Response:", result);
+        return result;
+    }
+
+    /*
     private String RegisterDevice( String NickName, String key){
 
         String result="";
@@ -955,9 +1013,42 @@ public class MainActivity extends AppCompatActivity {
 
         return  result;
     }
+    */
+
+    private String POST_ON_OFF_Device(String userId,String key, String command){
+
+        //http://khansystems.com/clienteQuery/index.php?Update=000002999ON
+        //http://khansystems.com/clienteQuery/index.php?Update=000002999OF
 
 
+        String response="";
 
+        HashMap<String, String>params=new HashMap<>();
+        params.put("Update", userId+key+command);
+
+        try {
+            //Consider next request:
+            HttpRequest req = new HttpRequest(serverURL);
+
+            response= req.preparePost().withData(params).sendAndReadString();
+        }
+        catch(SocketTimeoutException e){
+            Toast.makeText(getBaseContext(), "Connection TimedOut", Toast.LENGTH_LONG).show();
+        }
+        catch (MalformedURLException e){
+
+            response=e.getMessage();
+        }
+        catch (IOException e){
+            response=e.getMessage();
+        }
+
+        return response;
+
+    }
+
+
+/*
     private String POST_ON_OFF_Device( String userId, String key, String command){
 
 
@@ -997,6 +1088,7 @@ public class MainActivity extends AppCompatActivity {
 
         return  result;
     }
+    */
 
     private class HttpPOST_TurnON_OFF extends AsyncTask<String, Void, String> {
 
