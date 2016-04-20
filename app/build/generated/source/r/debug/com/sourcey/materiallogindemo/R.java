@@ -2009,10 +2009,10 @@ containing a value of this type.
     }
     public static final class id {
         public static final int ButtonConnection=0x7f0c006b;
-        public static final int Delete=0x7f0c0085;
-        public static final int Dimmer=0x7f0c0083;
         public static final int LoadDevices=0x7f0c0082;
-        public static final int Save=0x7f0c0084;
+        public static final int PopUpDimmer=0x7f0c0083;
+        public static final int PopUpOff=0x7f0c0085;
+        public static final int PopUpOn=0x7f0c0084;
         public static final int SaveDevices=0x7f0c0081;
         public static final int WipeDevices=0x7f0c0080;
         public static final int action0=0x7f0c0072;

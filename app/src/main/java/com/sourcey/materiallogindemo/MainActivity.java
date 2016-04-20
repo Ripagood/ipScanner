@@ -1,6 +1,7 @@
 package com.sourcey.materiallogindemo;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -106,6 +107,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    private ProgressDialog progress;
 
     //variable to store names
     private String m_Text = "";
@@ -190,14 +192,6 @@ public class MainActivity extends AppCompatActivity {
             // new HttpAsyncTask().execute("http://192.168.0.25/KHAN?");
         }
 
-
-
-
-
-
-
-
-
     }
     //Intended for debugging purposes only
     public void Connection(View view){
@@ -272,9 +266,9 @@ public class MainActivity extends AppCompatActivity {
                                              // put code on click operation
                                              Log.d("Button Pressed ON", deviceKey);
 
-                                             if (serverConnection == Boolean.TRUE ) {
+                                             if (serverConnection == Boolean.TRUE) {
 
-                                                 new HttpPOST_TurnON_OFF().execute(NumericUserId,deviceKey,"ON");
+                                                 new HttpPOST_TurnON_OFF().execute(NumericUserId, deviceKey, "ON");
 
                                              } else {
 
@@ -539,7 +533,7 @@ public class MainActivity extends AppCompatActivity {
 
         String urlDiscovery= "http://";
         String urlDevice = null;
-        String urlCommand = "/KHAN?";
+        String urlCommand = "/KHAN";
 
         Log.d("IP CHECKED", longToIP(ipSubnet));
         ipSubnet+=0x01000000;//endianess , first address
@@ -550,14 +544,34 @@ public class MainActivity extends AppCompatActivity {
         Log.d("IP CHECKED", intToIP(ipSubnet));
         Log.d("IP CHECKED", intToIP(ipBroadcast));
 
+        int i;
 
 
 
         //we scan every ip address for the devices until the broadcast address is reached
 
+        progress=new ProgressDialog(this);
+
+        progress.setMessage("Scanning network for Devices");
+        progress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        //progress.setIndeterminate(true);
+        progress.setProgress(0);
+        progress.setCanceledOnTouchOutside(false);
+        progress.setCancelable(true);
+        progress.setButton(ProgressDialog.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //Cancel download task
+                ScanDevices(null);
+                progress.dismiss();
+            }
+        });
+        progress.show();
+
 
         Log.d("IP CHECKED", intToIP(ipSubnet));
-        for(int i=0; invertIP(ipSubnet) <= invertIP(ipBroadcast)   ;ipSubnet+=0x01000000){
+        for(i=0; invertIP(ipSubnet) <= invertIP(ipBroadcast)   ;ipSubnet+=0x01000000){
 
             // call AsynTask to perform network operation on separate thread
             i++;
@@ -568,6 +582,11 @@ public class MainActivity extends AppCompatActivity {
             //new HttpAsyncTask().execute(urlDiscovery + urlDevice + urlCommand);
             // MakeRequestGet(urlDiscovery+urlDevice+urlCommand);
         }
+
+
+
+        progress.setMax(i);
+
 
 
 
@@ -589,6 +608,38 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private String GET2(String url){
+
+        String response="";
+
+        try{
+            //Consider next request:
+            HttpRequest req=new HttpRequest(url);
+            // prepare http get request,  send to "http://host:port/path" and read server's response as String
+            response=  req.prepare().sendAndReadString();
+        }
+        catch(MalformedURLException e){
+            response="malformedurl";
+            Log.d("MalformedURl", e.getLocalizedMessage());
+
+        }
+        catch (SocketTimeoutException e){
+
+
+            response = "timeout";
+            Log.d("Connection timed out", e.getLocalizedMessage());
+
+        }
+        catch(IOException e){
+
+
+            response = "ioexception";
+            Log.d("IOException",e.getLocalizedMessage());
+        }
+        return  response;
+
+    }
+
     private String GET(String url){
 
         String response="";
@@ -600,16 +651,16 @@ public class MainActivity extends AppCompatActivity {
             response=  req.prepare().sendAndReadString();
         }
         catch(MalformedURLException e){
-            response=e.getLocalizedMessage();
-            Log.d("MalformedURl",response);
+            response="malformedurl";
+            Log.d("MalformedURl",e.getLocalizedMessage());
         }
         catch (SocketTimeoutException e){
-            response=e.getLocalizedMessage();
-            Log.d("Connection timed out", response);
+            response="timeout";
+            Log.d("Connection timed out", e.getLocalizedMessage());
         }
         catch(IOException e){
-            response = e.getLocalizedMessage();
-            Log.d("IOException",response);
+            response = "ioexception";
+            Log.d("IOException",e.getLocalizedMessage());
         }
         return  response;
 
@@ -693,13 +744,22 @@ public class MainActivity extends AppCompatActivity {
         protected String doInBackground(String... urls) {
 
             ipAdd = urls[0];
-            return GET(urls[0]);
+            return GET2(urls[0]);
         }
+
+
+
         // onPostExecute displays the results of the AsyncTask.
         @Override
         protected void onPostExecute(String result) {
             //Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_LONG).show();
             //Toast.makeText(getBaseContext(), result, Toast.LENGTH_LONG).show();
+
+            progress.incrementProgressBy(1);
+            if(progress.getMax() == progress.getProgress()){
+                progress.dismiss();
+                ScanDevices(null);
+            }
 
             if(result.equals("ACCEPTED")){
 
@@ -722,8 +782,9 @@ public class MainActivity extends AppCompatActivity {
                 //Toast.makeText(getBaseContext(), ipDevice, Toast.LENGTH_SHORT).show();
                 Log.d("IP ACCEPTED", ipAdd);
                 devicesByIp.add(ipAdd);
-                devices.put(ipAdd,addresses);
+                devices.put(ipAdd, addresses);
                 printDevices2();
+
 
             }
 
