@@ -5,9 +5,9 @@
         android:orderInCategory="100" app:showAsAction="never" />
 
     <item  android:id="@+id/WipeDevices"
-        android:title="Wipe Devices"/>
+        android:title="Delete Devices"/>
     <item  android:id="@+id/SaveDevices"
-        android:title="Save Devices"/>
+        android:title="Register Devices"/>
     <item  android:id="@+id/LoadDevices"
         android:title="Load Devices"/>
 

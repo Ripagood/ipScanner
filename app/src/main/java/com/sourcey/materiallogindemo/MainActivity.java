@@ -15,6 +15,7 @@ import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.InputFilter;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Gravity;
@@ -437,6 +438,105 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void RegisterDevicesConfirm(){
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Register Devices");
+        builder.setMessage("You are about to sync your devices to the cloud. Continue?");
+
+
+// Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                WipeDevices(); //Delete from server, then register
+                RegisterDevices();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        //builder.show();
+        AlertDialog dialog = builder.show();
+        TextView messageText = (TextView)dialog.findViewById(android.R.id.message);
+        messageText.setGravity(Gravity.CENTER);
+        dialog.show();
+
+
+
+    }
+
+    private void WipeSettingsConfirm(){
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Delete Settings");
+        builder.setMessage("You are about to wipe your settings. This will delete your local devices and user. Continue?");
+
+
+
+// Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                WipeSettings();
+                deleteHashMap();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        AlertDialog dialog = builder.show();
+        TextView messageText = (TextView)dialog.findViewById(android.R.id.message);
+        messageText.setGravity(Gravity.CENTER);
+        dialog.show();
+       // builder.show();
+
+
+
+    }
+
+    private void WipeDevicesConfirm(){
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Delete Devices");
+        builder.setMessage("You are about to delete your registered devices from the cloud. Continue?");
+
+
+// Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                WipeDevices();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        //builder.show();
+        AlertDialog dialog = builder.show();
+        TextView messageText = (TextView)dialog.findViewById(android.R.id.message);
+        messageText.setGravity(Gravity.CENTER);
+        dialog.show();
+
+
+
+    }
+
     private void ShowDialog(String key)
     {
         final AlertDialog.Builder popDialog = new AlertDialog.Builder(this);
@@ -502,6 +602,8 @@ public class MainActivity extends AppCompatActivity {
         final EditText input = new EditText(this);
 // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
         input.setInputType(InputType.TYPE_CLASS_TEXT);
+        int maxLength = 12;
+        input.setFilters(new InputFilter[]{new InputFilter.LengthFilter(maxLength)});
         builder.setView(input);
 
 // Set up the buttons
@@ -1301,21 +1403,23 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.SaveDevices:
                 //Toast.makeText(getApplicationContext(),"Item 1 Selected",Toast.LENGTH_LONG).show();
-                RegisterDevices();
+                RegisterDevicesConfirm();
                 return true;
             case R.id.LoadDevices:
                 //Toast.makeText(getApplicationContext(),"Item 2 Selected",Toast.LENGTH_LONG).show();
                 new  HttpPOST_LoadDevices().execute(NumericUserId);
                 return true;
             case R.id.WipeDevices:
-                WipeDevices();
+
+                WipeDevicesConfirm();
                 //DELETE DEVICES FROM SERVER
                 return true;
 
             case R.id.action_settings:
                 //DELETES LOCAL SETTINGS
                 //WipeSettings();
-                deleteHashMap();
+                //deleteHashMap();
+                WipeSettingsConfirm();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
