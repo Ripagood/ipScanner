@@ -2014,6 +2014,7 @@ containing a value of this type.
         public static final int PopUpOff=0x7f0c0085;
         public static final int PopUpOn=0x7f0c0084;
         public static final int SaveDevices=0x7f0c0081;
+        public static final int TableLayout01=0x7f0c006c;
         public static final int WipeDevices=0x7f0c0080;
         public static final int action0=0x7f0c0072;
         public static final int action_bar=0x7f0c0057;
@@ -2081,7 +2082,6 @@ containing a value of this type.
         public static final int left=0x7f0c0024;
         public static final int line1=0x7f0c0077;
         public static final int line3=0x7f0c007b;
-        public static final int linearLayoutMain=0x7f0c006c;
         public static final int link_login=0x7f0c006f;
         public static final int link_signup=0x7f0c0069;
         public static final int listMode=0x7f0c000a;

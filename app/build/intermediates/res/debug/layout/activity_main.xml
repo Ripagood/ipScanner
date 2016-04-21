@@ -35,18 +35,18 @@
         android:layout_height="match_parent"
         android:layout_below="@id/ButtonConnection">
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/ButtonConnection"
-        android:layout_centerHorizontal="true"
-        android:id="@+id/linearLayoutMain">
+
+        <TableLayout android:id="@+id/TableLayout01"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ButtonConnection"
+            android:stretchColumns="0">
 
 
 
+        </TableLayout>
 
-    </LinearLayout>
+
 
 
     </ScrollView>

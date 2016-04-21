@@ -28,6 +28,8 @@ import android.widget.PopupMenu;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -217,8 +219,10 @@ public class MainActivity extends AppCompatActivity {
 
         //select the linear layout defined in the xml
 
-        final LinearLayout lm = (LinearLayout) findViewById(R.id.linearLayoutMain);
-        lm.removeAllViews();
+        //final LinearLayout lm = (LinearLayout) findViewById(R.id.linearLayoutMain);
+        //lm.removeAllViews();
+        final TableLayout tl = (TableLayout) findViewById(R.id.TableLayout01);
+        tl.removeAllViews();
 
         for (Map.Entry<String, String[]> entry : devices.entrySet()) {
             deviceNickName = entry.getKey();
@@ -228,11 +232,13 @@ public class MainActivity extends AppCompatActivity {
             deviceDutyCycle = value[2];
             // deviceKey = "666";
             //Create the LL to add a text view and a button
+            /*
             LinearLayout ll = new LinearLayout(this);
             ll.setOrientation(LinearLayout.HORIZONTAL);
             ll.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-            ll.setGravity(Gravity.CENTER);
-
+            ll.setGravity(Gravity.CENTER);*/
+            TableRow tr = new TableRow(this);
+            tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
 
             final Button btnChangeName = new Button(this);
             btnChangeName.setText(deviceNickName);
@@ -251,7 +257,10 @@ public class MainActivity extends AppCompatActivity {
 
             );
 
-            ll.addView(btnChangeName);
+            btnChangeName.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+            tr.addView(btnChangeName);
+
+            //ll.addView(btnChangeName);
 
 
             Button btnOn = new Button(this);
@@ -280,7 +289,9 @@ public class MainActivity extends AppCompatActivity {
 
             );
 
-            ll.addView(btnOn);
+            //ll.addView(btnOn);
+            btnOn.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+            tr.addView(btnOn);
 
             Button btnOFF = new Button(this);
             btnOFF.setText("OFF");
@@ -307,7 +318,9 @@ public class MainActivity extends AppCompatActivity {
 
             );
 
-            ll.addView(btnOFF);
+            //ll.addView(btnOFF);
+            btnOFF.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+            tr.addView(btnOFF);
 
 
             final Button btnSettings = new Button(this);
@@ -363,16 +376,21 @@ public class MainActivity extends AppCompatActivity {
 
             );
 
-            ll.addView(btnSettings);
+            //ll.addView(btnSettings);
+            btnSettings.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+            tr.addView(btnSettings);
+
+            tl.addView(tr);
 
 
 
 
-            ll.setGravity(Gravity.CENTER);
+
+            //ll.setGravity(Gravity.CENTER);
 
 
-            lm.addView(ll);
-            lm.setGravity(Gravity.CENTER);
+            //lm.addView(ll);
+            //lm.setGravity(Gravity.CENTER);
 
         }
 
