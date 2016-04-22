@@ -64,6 +64,7 @@ import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -653,7 +654,7 @@ public class MainActivity extends AppCompatActivity {
 
         String urlDiscovery= "http://";
         String urlDevice = null;
-        String urlCommand = "/KHAN";
+        String urlCommand = "/KHAN?";
 
         Log.d("IP CHECKED", longToIP(ipSubnet));
         ipSubnet+=0x01000000;//endianess , first address
@@ -728,6 +729,42 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private String GET3(String url){
+
+        String response="";
+        try {
+            URL oracle = new URL(url);
+            URLConnection yc = oracle.openConnection();
+            BufferedReader in = new BufferedReader(new InputStreamReader(
+                    yc.getInputStream()));
+            String inputLine;
+            while ((inputLine = in.readLine()) != null)response += inputLine;
+                //System.out.println(inputLine);
+
+            in.close();
+        }
+        catch(MalformedURLException e){
+            response="malformedurl";
+            Log.d("MalformedURl", e.getLocalizedMessage());
+
+        }
+        catch (SocketTimeoutException e){
+
+
+            response = "timeout";
+            Log.d("Connection timed out", e.getLocalizedMessage());
+
+        }
+        catch(IOException e){
+
+
+            response = "ioexception";
+            Log.d("IOException",e.getLocalizedMessage());
+        }
+        return  response;
+
+    }
+
     private String GET2(String url){
 
         String response="";
@@ -786,8 +823,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    /*
-    public static String GET(String url){
+       public static String GET4(String url){
         InputStream inputStream = null;
         String result = "";
         try {
@@ -818,7 +854,6 @@ public class MainActivity extends AppCompatActivity {
 
         return result;
     }
-    */
 
     private static String convertInputStreamToString(InputStream inputStream) throws IOException{
         BufferedReader bufferedReader = new BufferedReader( new InputStreamReader(inputStream));
@@ -864,7 +899,7 @@ public class MainActivity extends AppCompatActivity {
         protected String doInBackground(String... urls) {
 
             ipAdd = urls[0];
-            return GET2(urls[0]);
+            return GET4(urls[0]);
         }
 
 
@@ -883,27 +918,48 @@ public class MainActivity extends AppCompatActivity {
 
             if(result.equals("ACCEPTED")){
 
+
+
                 ipAdd = parseIP(ipAdd);
 
-                addresses[0]=ipAdd;//ipaddress
 
-                Random r = new Random();
-                int i1 = r.nextInt(999 - 0) + 0;
-
-                String convertedKey= intToKey(i1);
-
-                while(devices.containsValue(convertedKey)== Boolean.TRUE){
-
-                    i1 = r.nextInt(999 - 0) + 0;
-
-                    convertedKey= intToKey(i1);
+                if( devices.containsValue(ipAdd) == Boolean.TRUE)
+                {
+                    Toast.makeText(getBaseContext(),"Device already added", Toast.LENGTH_SHORT).show();
                 }
-                addresses[1]=convertedKey;//devicekey assigned
-                //Toast.makeText(getBaseContext(), ipDevice, Toast.LENGTH_SHORT).show();
-                Log.d("IP ACCEPTED", ipAdd);
-                devicesByIp.add(ipAdd);
-                devices.put(ipAdd, addresses);
-                printDevices2();
+                else {
+
+                    addresses[0] = ipAdd;//ipaddress
+
+                    Random r = new Random();
+                    int i1 = r.nextInt(999 - 0) + 0;
+
+                    String convertedKey = intToKey(i1);
+
+                    while (devices.containsValue(convertedKey) == Boolean.TRUE) {
+
+                        i1 = r.nextInt(999 - 0) + 0;
+
+                        convertedKey = intToKey(i1);
+                    }
+                    addresses[1] = convertedKey;//devicekey assigned
+                    //Toast.makeText(getBaseContext(), ipDevice, Toast.LENGTH_SHORT).show();
+                    addresses[2] = "100"; //Init with 100
+                    Log.d("IP ACCEPTED", ipAdd);
+                    devicesByIp.add(ipAdd);
+                    String intermediateNickName="";
+                    if(ipAdd.length()>11)
+                    {
+                        intermediateNickName=ipAdd.substring(ipAdd.length()-11,ipAdd.length());
+                    }else
+                    {
+                        intermediateNickName=ipAdd;
+                    }
+                    devices.put(intermediateNickName, addresses);
+
+                    printDevices2();
+
+                }
 
 
             }
@@ -1221,6 +1277,7 @@ public class MainActivity extends AppCompatActivity {
             response=e.getMessage();
         }
         catch (IOException e){
+            Toast.makeText(getBaseContext(), "Device Not Found", Toast.LENGTH_LONG).show();
             response=e.getMessage();
         }
 
