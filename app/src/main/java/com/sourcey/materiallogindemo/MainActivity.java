@@ -363,6 +363,11 @@ public class MainActivity extends AppCompatActivity {
                                                                    //WipeDevices();
                                                                    PopUpOFF(btnChangeName.getText().toString());
                                                                    return true;
+                                                               case R.id.PopUpInfo:
+                                                                   //WipeDevices();
+                                                                   ///PopUpOFF(btnChangeName.getText().toString());
+                                                                   ShowDialogInfo(btnChangeName.getText().toString());
+                                                                   return true;
 
                                                                case R.id.action_settings:
                                                                    return true;
@@ -592,6 +597,36 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void ShowDialogInfo(String key)
+    {
+        final AlertDialog.Builder popDialog = new AlertDialog.Builder(this);
+
+        final String deviceK = key;
+
+        //popDialog.setIcon(android.R.drawable.btn_star_big_on);
+        popDialog.setTitle("Device Information");
+
+
+        addresses = devices.get(key);
+
+        popDialog.setMessage("IP: "+ addresses[0]+ "\n"+
+                             "Intensity: "+ addresses[2]+ "\n"+
+                              "Key: "+ addresses[1]);
+        // Button OK
+        popDialog.setPositiveButton("OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+
+                });
+
+
+        popDialog.create();
+        popDialog.show();
+
+    }
+
     private void ChangeNameAlert(String device){
 
 
@@ -612,8 +647,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 m_Text = input.getText().toString();
-                ChangeNameHashMap(m_Text, deviceNickName);
-                printDevices2();
+                if(devices.containsKey(m_Text))
+                {
+                    Toast.makeText(getBaseContext(),"Device Name already selected. Please introduce another one." , Toast.LENGTH_LONG).show();
+
+                }else
+                {
+                    ChangeNameHashMap(m_Text, deviceNickName);
+                    printDevices2();
+                }
+
 
 
 
@@ -923,9 +966,9 @@ public class MainActivity extends AppCompatActivity {
                 ipAdd = parseIP(ipAdd);
 
 
-                if( devices.containsValue(ipAdd) == Boolean.TRUE)
+                if( hashmapContainsIP(ipAdd))
                 {
-                    Toast.makeText(getBaseContext(),"Device already added", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getBaseContext(),"Device with IP "+ ipAdd +" already added", Toast.LENGTH_LONG).show();
                 }
                 else {
 
@@ -966,6 +1009,41 @@ public class MainActivity extends AppCompatActivity {
 
 
         }
+
+        private Boolean hashmapContainsIP(String ipToCheck)
+        {
+            Boolean retVal = Boolean.FALSE;
+            for (Map.Entry<String, String[]> entry : devices.entrySet())
+            {
+                deviceNickName = entry.getKey();
+                String value[] = entry.getValue();
+                deviceIp = value[0];
+                deviceKey = value[1];
+                deviceDutyCycle = value[2];
+                if(deviceIp.equals(ipToCheck))
+                {
+                    retVal = Boolean.TRUE;
+                }
+            }
+            return retVal;
+
+        }
+    }
+
+    private void setKeysToDevices()
+    {
+        // TODO Send the SETKEY command to each device on the network
+
+        for (Map.Entry<String, String[]> entry : devices.entrySet())
+        {
+            deviceNickName = entry.getKey();
+            String value[] = entry.getValue();
+            deviceIp = value[0];
+            deviceKey = value[1];
+            deviceDutyCycle = value[2];
+
+        }
+
     }
 
 
@@ -1005,7 +1083,7 @@ public class MainActivity extends AppCompatActivity {
         protected String doInBackground(String... urls) {
 
             ipAdd = urls[0];
-            return GET(urls[0]);
+            return GET4(urls[0]);
         }
         // onPostExecute displays the results of the AsyncTask.
         @Override

@@ -518,6 +518,7 @@ int drawable snackbar_background 0x7f02003d
 int id ButtonConnection 0x7f0c006b
 int id LoadDevices 0x7f0c0082
 int id PopUpDimmer 0x7f0c0083
+int id PopUpInfo 0x7f0c0086
 int id PopUpOff 0x7f0c0085
 int id PopUpOn 0x7f0c0084
 int id SaveDevices 0x7f0c0081

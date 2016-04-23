@@ -14,4 +14,7 @@
     <item
         android:id="@+id/PopUpOff"
         android:title="Off"/>
+    <item
+        android:id="@+id/PopUpInfo"
+        android:title="Info"/>
 </menu>
