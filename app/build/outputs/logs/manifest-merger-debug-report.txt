@@ -25,8 +25,12 @@ uses-permission#android.permission.ACCESS_NETWORK_STATE
 ADDED from AndroidManifest.xml:7:5
 	android:name
 		ADDED from AndroidManifest.xml:7:22
+uses-permission#android.permission.CHANGE_WIFI_STATE
+ADDED from AndroidManifest.xml:8:5
+	android:name
+		ADDED from AndroidManifest.xml:8:22
 application
-ADDED from AndroidManifest.xml:9:5
+ADDED from AndroidManifest.xml:10:5
 MERGED from com.android.support:appcompat-v7:22.2.0:22:5
 MERGED from com.android.support:support-v4:22.2.0:22:5
 MERGED from com.android.support:design:22.2.0:22:5
@@ -62,15 +66,29 @@ ADDED from AndroidManifest.xml:22:17
 activity#com.sourcey.materiallogindemo.LoginActivity
 ADDED from AndroidManifest.xml:25:9
 	android:theme
-		ADDED from AndroidManifest.xml:25:78
+		ADDED from AndroidManifest.xml:27:13
 	android:name
-		ADDED from AndroidManifest.xml:25:19
+		ADDED from AndroidManifest.xml:26:13
 activity#com.sourcey.materiallogindemo.SignupActivity
-ADDED from AndroidManifest.xml:26:9
+ADDED from AndroidManifest.xml:28:9
 	android:theme
-		ADDED from AndroidManifest.xml:26:79
+		ADDED from AndroidManifest.xml:30:13
 	android:name
-		ADDED from AndroidManifest.xml:26:19
+		ADDED from AndroidManifest.xml:29:13
+activity#com.sourcey.materiallogindemo.ConnectAP
+ADDED from AndroidManifest.xml:31:9
+	android:label
+		ADDED from AndroidManifest.xml:33:13
+	android:parentActivityName
+		ADDED from AndroidManifest.xml:34:13
+	android:name
+		ADDED from AndroidManifest.xml:32:13
+meta-data#android.support.PARENT_ACTIVITY
+ADDED from AndroidManifest.xml:35:13
+	android:name
+		ADDED from AndroidManifest.xml:36:17
+	android:value
+		ADDED from AndroidManifest.xml:37:17
 uses-sdk
 INJECTED from AndroidManifest.xml:0:0 reason: use-sdk injection requested
 MERGED from com.android.support:appcompat-v7:22.2.0:20:5

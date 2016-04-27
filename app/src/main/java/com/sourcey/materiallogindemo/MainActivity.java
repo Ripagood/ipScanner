@@ -1479,7 +1479,7 @@ public class MainActivity extends AppCompatActivity {
         try {
 
 
-            FileOutputStream fileOutputStream = openFileOutput("hs.bin",Context.MODE_PRIVATE);
+            FileOutputStream fileOutputStream = openFileOutput("hs.bin", Context.MODE_PRIVATE);
             ObjectOutputStream objectOutputStream= new ObjectOutputStream(fileOutputStream);
             objectOutputStream.writeObject(devices);
             objectOutputStream.close();
@@ -1513,6 +1513,12 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    public void StartActivityConnectAP()
+    {
+        Intent intent = new Intent(this, ConnectAP.class);
+        startActivity(intent);
+
+    }
 
 
 
@@ -1558,6 +1564,12 @@ public class MainActivity extends AppCompatActivity {
                 //WipeSettings();
                 //deleteHashMap();
                 WipeSettingsConfirm();
+                return true;
+            case R.id.ConnectAP:
+                //DELETES LOCAL SETTINGS
+                //WipeSettings();
+                //deleteHashMap();
+               StartActivityConnectAP();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

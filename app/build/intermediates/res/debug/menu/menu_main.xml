@@ -10,6 +10,8 @@
         android:title="Register Devices"/>
     <item  android:id="@+id/LoadDevices"
         android:title="Load Devices"/>
+    <item  android:id="@+id/ConnectAP"
+        android:title="Connect AP"/>
 
 </menu>
 <!-- From: file:/home/elias/Projects/materiallogindemo/app/src/main/res/menu/menu_main.xml -->

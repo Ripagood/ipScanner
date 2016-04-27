@@ -3,6 +3,9 @@ package com.sourcey.materiallogindemo;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.support.v7.app.AppCompatActivity;
@@ -14,8 +17,10 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -24,7 +29,12 @@ import android.widget.Toast;
 import com.sourcey.materiallogindemo.R;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import android.content.BroadcastReceiver;
 
 public class ConnectAP extends AppCompatActivity {
 
@@ -33,12 +43,35 @@ public class ConnectAP extends AppCompatActivity {
     String pass_Text;
 
 
+    List<String> ssids = new ArrayList<>(5);
+
+
+
+    WifiManager mainWifi;
+    WifiReceiver receiverWifi;
+    List<ScanResult> wifiList;
+    StringBuilder sb = new StringBuilder();
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connect_ap);
         context = getApplicationContext();
+
+
+
+
+        mainWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        receiverWifi = new WifiReceiver();
+        registerReceiver(receiverWifi, new IntentFilter(
+                WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+        mainWifi.startScan();
+
+
+
     }
+
 
 
 
@@ -193,6 +226,46 @@ public class ConnectAP extends AppCompatActivity {
 
 
 
+    private void printAPs()
+    {
+        final TableLayout tl = (TableLayout) findViewById(R.id.TableLayoutAP);
+        tl.removeAllViews();
+        String ssid;
+        for(int i=0; i<ssids.size();i++)
+        {
+            ssid=ssids.get(i);
+
+            TableRow tr = new TableRow(this);
+            tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+
+            final Button btnAP = new Button(this);
+            btnAP.setText(ssid);
+
+
+
+            btnAP.setOnClickListener(new View.OnClickListener() {
+                                         @Override
+                                         public void onClick(View v) {
+                                             // put code on click operation
+                                             Log.d("Button PressedName", btnAP.getText().toString());
+
+
+                                         }
+                                     }
+
+            );
+
+            btnAP.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+            tr.addView(btnAP);
+            tl.addView(tr);
+
+
+        }
+
+
+    }
+
+
 
 
     @Override
@@ -215,5 +288,61 @@ public class ConnectAP extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    class WifiReceiver extends BroadcastReceiver {
+        public void onReceive(Context c, Intent intent) {
+            /*
+            if(ssids.size()>0) {
+                ssids.clear(); //clean the old results
+                ssids.
+            }*/
+            String pattern1 = "SSID: ";
+            String pattern2 = ",";
+
+            sb = new StringBuilder();
+            wifiList = mainWifi.getScanResults();
+
+
+            if (wifiList != null) {
+                for(ScanResult s : wifiList) {
+                    //"CONNECTION_NAME" is the name of SSID you would like filter
+                    if (s.SSID != null ) {
+                        ssids.add(s.SSID.toString());
+                        Log.d("ssids", s.SSID.toString());
+                    }
+                }
+            }
+
+
+
+
+
+/*
+            for(int i = 0; i < wifiList.size(); i++){
+               // sb.append(new Integer(i+1).toString() + ".");
+              //  sb.append((wifiList.get(i)).toString());
+               // sb.append("\n");
+
+
+
+                Pattern p = Pattern.compile(Pattern.quote(pattern1) + "(.*?)" + Pattern.quote(pattern2));
+
+                Matcher m = p.matcher(wifiList.get(i).toString());
+
+                while (m.find()) {
+                    //System.out.println(m.group(1));
+                    Log.d("ssids", m.group(1));
+
+                        ssids.add(m.group(1));
+
+                }
+
+            }
+            */
+            printAPs();
+           // mainText.setText(sb);
+           // Log.d("Button PressedName", sb.toString());
+        }
     }
 }
