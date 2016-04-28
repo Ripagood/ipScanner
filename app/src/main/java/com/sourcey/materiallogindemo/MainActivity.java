@@ -276,6 +276,7 @@ public class MainActivity extends AppCompatActivity {
                                              deviceKey = arr[1];
                                              // put code on click operation
                                              Log.d("Button Pressed ON", deviceKey);
+                                             deviceIp = arr[0];
 
                                              if (serverConnection == Boolean.TRUE) {
 
