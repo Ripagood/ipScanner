@@ -101,62 +101,6 @@ public class ConnectAP extends AppCompatActivity {
     }
 
 
-
-
-    public void ConnectToAP(View view)
-    {
-        final TableLayout tl = (TableLayout) findViewById(R.id.TableLayoutAP);
-        tl.removeAllViews();
-        //We must connect to the KHAN AP and then send the ssid and pass for our home network
-
-        //first we scan for wifi networks
-
-        WifiManager wifiMgr = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        List<WifiConfiguration> list = wifiMgr.getConfiguredNetworks();
-        String ssid;
-
-
-
-        for(int i=0; i<list.size();i++){
-
-            ssid=list.get(i).SSID.toString();
-
-            TableRow tr = new TableRow(this);
-            tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-
-            final Button btnAP = new Button(this);
-            btnAP.setText(ssid);
-
-
-
-            btnAP.setOnClickListener(new View.OnClickListener() {
-                                                 @Override
-                                                 public void onClick(View v) {
-                                                     // put code on click operation
-                                                     Log.d("Button PressedName", btnAP.getText().toString());
-
-
-                                                 }
-                                             }
-
-            );
-
-            btnAP.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-            tr.addView(btnAP);
-            tl.addView(tr);
-
-
-        }
-
-
-
-
-
-
-
-    }
-
-
     private void selectedAP(String ssids){
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -538,6 +482,7 @@ public class ConnectAP extends AppCompatActivity {
 
 
             if (wifiList != null) {
+                ssids.clear();
                 for(ScanResult s : wifiList) {
                     //"CONNECTION_NAME" is the name of SSID you would like filter
                     if (s.SSID != null ) {
