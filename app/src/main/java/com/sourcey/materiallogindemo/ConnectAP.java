@@ -297,6 +297,8 @@ public class ConnectAP extends AppCompatActivity {
         final TableLayout tl = (TableLayout) findViewById(R.id.TableLayoutAP);
         tl.removeAllViews();
         String ssid;
+
+
         for(int i=0; i<ssids.size();i++)
         {
             ssid=ssids.get(i);
@@ -366,6 +368,14 @@ public class ConnectAP extends AppCompatActivity {
             //Toast.makeText(getBaseContext(), result, Toast.LENGTH_LONG).show();
             Log.d("Received",result);
             //display results
+
+            if(result.equals("saved"))
+            {
+                //correct delivery of the data
+                WifiManager wifiManager = (WifiManager)context.getSystemService(Context.WIFI_SERVICE);
+                wifiManager.disconnect();
+                Toast.makeText(getBaseContext(), "Delivered! Scan for devices", Toast.LENGTH_LONG).show();
+            }
 
 
 
@@ -485,7 +495,7 @@ public class ConnectAP extends AppCompatActivity {
                 ssids.clear();
                 for(ScanResult s : wifiList) {
                     //"CONNECTION_NAME" is the name of SSID you would like filter
-                    if (s.SSID != null ) {
+                    if (s.SSID != null && s.SSID.toLowerCase().contains("khan")) {
                         ssids.add(s.SSID.toString());
                         Log.d("ssids", s.SSID.toString());
                     }
