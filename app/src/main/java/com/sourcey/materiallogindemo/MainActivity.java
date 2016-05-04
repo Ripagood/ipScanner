@@ -1001,6 +1001,13 @@ public class MainActivity extends AppCompatActivity {
                     }
                     devices.put(intermediateNickName, addresses);
 
+                    //http://192.168.0.113/SETKEY?key=999
+                    String urlCommand = "/SETKEY?=key";
+
+                    //send the setkey command
+                    //might have to be done at the end of the async tasks
+                    //TODO test the new command and decide wether to relocate it or not to the end of the async tasks
+                    new HttpAsyncTask().execute(ipAdd +  urlCommand + addresses[1]);
                     printDevices2();
 
                 }
