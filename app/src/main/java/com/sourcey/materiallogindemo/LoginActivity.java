@@ -3,6 +3,7 @@ package com.sourcey.materiallogindemo;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -14,13 +15,27 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
+import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import butterknife.ButterKnife;
 import butterknife.Bind;
 
 public class LoginActivity extends AppCompatActivity {
+
+    final String serverURL = "http://khansystems.com/clienteQuery/index.php";
+
+
     private static final String TAG = "LoginActivity";
     private static final int REQUEST_SIGNUP = 0;
     private static final String PREFS_NAME = "USER_INFORMATION";
+    private int loginSuccess =0;
+
+    ProgressDialog progressDialog;
 
     @Bind(R.id.input_email) EditText _emailText;
     @Bind(R.id.input_password) EditText _passwordText;
@@ -56,8 +71,11 @@ public class LoginActivity extends AppCompatActivity {
         String email = prefs.getString("USER_ID", "");
         String password = prefs.getString("PASSWORD","");
 
+
         _emailText.setText(email);
         _passwordText.setText(password);
+
+
 
     }
 
@@ -71,7 +89,8 @@ public class LoginActivity extends AppCompatActivity {
 
         _loginButton.setEnabled(false);
 
-        final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this,
+
+        progressDialog = new ProgressDialog(LoginActivity.this,
                 R.style.AppTheme_Dark_Dialog);
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage("Authenticating...");
@@ -89,8 +108,14 @@ public class LoginActivity extends AppCompatActivity {
         editor.putString("PASSWORD", password);
         editor.commit(); //important, otherwise it wouldn't save.
 
+        new HttpLogin().execute(email,password);
 
 
+
+
+
+
+        /*
         new android.os.Handler().postDelayed(
                 new Runnable() {
                     public void run() {
@@ -99,7 +124,7 @@ public class LoginActivity extends AppCompatActivity {
                         // onLoginFailed();
                         progressDialog.dismiss();
                     }
-                }, 3000);
+                }, 3000);*/
     }
 
 
@@ -138,7 +163,7 @@ public class LoginActivity extends AppCompatActivity {
         String email = _emailText.getText().toString();
         String password = _passwordText.getText().toString();
 
-        if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+        if (email.isEmpty() ) {
             _emailText.setError("enter a valid email address");
             valid = false;
         } else {
@@ -154,4 +179,83 @@ public class LoginActivity extends AppCompatActivity {
 
         return valid;
     }
+
+
+
+
+    private class HttpLogin extends AsyncTask<String, Void, String> {
+
+        private String Username;
+        private String Password;
+
+
+
+        @Override
+        protected String doInBackground(String... urls) {
+
+            Username = urls[0];
+            Password = urls[1];
+            return confirmLogin(Username, Password);
+        }
+        // onPostExecute displays the results of the AsyncTask.
+        @Override
+        protected void onPostExecute(String result) {
+            //Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_LONG).show();
+            //Toast.makeText(getBaseContext(), result, Toast.LENGTH_LONG).show();
+
+            String extracted;
+
+            final Pattern p = Pattern.compile("(\\d{6})" );
+            final Matcher m = p.matcher( result );
+            if ( m.find() ) {
+                extracted= m.group( 0 );
+                //save the numeric id
+                SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putString("NUMERIC_ID", extracted);
+                Log.d("postexec","correct");
+                // correct authentication
+                onLoginSuccess();
+                progressDialog.dismiss();
+            }
+            else{
+                extracted="";
+                Log.d("postexec","failed");
+                onLoginFailed();
+                progressDialog.dismiss();
+            }
+
+
+
+        }
+    }
+
+
+    private String confirmLogin(String username, String password){
+
+        //http://khansystems.com/clienteQuery/index.php?username=jo.echeagaray@gmail.com&password=admin
+
+        String result="";
+        try {
+            HttpRequest req = new HttpRequest(serverURL);
+            HashMap<String, String> params = new HashMap<>();
+            params.put("username", username);
+            params.put("password", password);
+            result=req.preparePost().withData(params).sendAndReadString();
+        }
+        catch( SocketTimeoutException e){
+            Log.d("ConnectionTimeOut",e.getLocalizedMessage());
+            Toast.makeText(getBaseContext(), "Connection Time out" , Toast.LENGTH_LONG).show();
+
+        }
+        catch(MalformedURLException e){
+            Log.d("MalformedURl",e.getLocalizedMessage());
+        }
+        catch(IOException e){
+            Log.d("IO",e.getLocalizedMessage());
+        }
+        Log.d("Http Login Response:", result);
+        return result;
+    }
+
 }

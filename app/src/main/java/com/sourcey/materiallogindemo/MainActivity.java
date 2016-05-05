@@ -135,6 +135,7 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, 0);
         NumericUserId = prefs.getString("NUMERIC_ID", "");
+        Log.d("numericid",NumericUserId);
 
         loadHashMap();
         printDevices2();
@@ -1356,7 +1357,8 @@ public class MainActivity extends AppCompatActivity {
             response= req.preparePost().withData(params).sendAndReadString();
         }
         catch(SocketTimeoutException e){
-            Toast.makeText(getBaseContext(), "Connection TimedOut", Toast.LENGTH_LONG).show();
+            //Toast.makeText(getBaseContext(), "Connection TimedOut", Toast.LENGTH_SHORT).show();
+            Log.d("connection","timeout");
         }
         catch (MalformedURLException e){
 
