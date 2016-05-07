@@ -88,20 +88,23 @@ public class MainActivity extends AppCompatActivity {
 
 
     List<String> devicesByIp = new ArrayList<>(5);
-    HashMap<String, String[]> devices = new HashMap<>();
+    static HashMap<String, String[]> devices = new HashMap<>();
 
     // name: NIckName , value = ip, key
 
     Integer numericDC;
-    String deviceDutyCycle;
-    String deviceIp;
-    String deviceKey;
-    String deviceNickName;
-    String[] addresses= {"","",""};
+   static  String deviceDutyCycle;
+    static String deviceIp;
+    static String deviceKey;
+    static String deviceNickName;
+    static String[] addresses= {"","",""};
     //ip,key,dc
-    String UserId="elias v";
-    String NumericUserId;// = "000002";
-    final String serverURL = "http://khansystems.com/clienteQuery/index.php";
+    public static String UserId="";
+    public static String NumericUserId="";// = "000002";
+
+
+    public static String UserPassword="";
+    public final static String serverURL = "http://khansystems.com/clienteQuery/index.php";
 
     Boolean serverConnection = Boolean.FALSE;
 
@@ -132,20 +135,69 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, 0);
+        UserId = prefs.getString("USER_ID", "");
+        UserPassword = prefs.getString("PASSWORD","");
         NumericUserId = prefs.getString("NUMERIC_ID", "");
-        Log.d("numericid",NumericUserId);
+
+
+        Log.d("numeric_id",NumericUserId);
 
         loadHashMap();
         printDevices2();
 
 
+        startService(new Intent(this, TimeService.class));
 
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
+
+
     }
 
+    public static void SetRemoteDevices( String remote)
+    {
+        //TODO set remote state to every device on the network
+        Log.d("remote", remote);
+        //http://192.168.0.113/REMOTE?UserID=000002
+        //http://192.168.0.113/NOREMOTE
+        if(remote.equals("ON"))
+        {
+            //give credentials
+            Log.d("device", "/REMOTE?UserID="+NumericUserId);
+            DeviceForEach("/REMOTE?UserID="+NumericUserId);
+
+
+        }else if(remote.equals("OFF"))
+        {
+            //remove credentials
+        }else
+        {
+
+            /*MISRA*/
+            //do nothing
+        }
+
+    }
+
+
+
+    private static void DeviceForEach(String command)
+    {
+        for (Map.Entry<String, String[]> entry : devices.entrySet()) {
+            deviceNickName = entry.getKey();
+            String value[] = entry.getValue();
+            deviceIp = value[0];
+            deviceKey = value[1];
+            deviceDutyCycle = value[2];
+
+            Log.d("device", command);
+            new HttpCommand().execute(deviceIp + command);
+
+        }
+
+
+    }
 
 
 
@@ -352,12 +404,12 @@ public class MainActivity extends AppCompatActivity {
                                                            //return true;
                                                            switch (item.getItemId()) {
                                                                case R.id.PopUpDimmer:
-                                                                   //Toast.makeText(getApplicationContext(),"Item 1 Selected",Toast.LENGTH_LONG).show();
+                                                                   //Toast.makeText(getApplicationContext(),"Item 1 Selected",Toast.LENGTH_SHORT).show();
                                                                    //RegisterDevices();
                                                                    ShowDialog(btnChangeName.getText().toString());
                                                                    return true;
                                                                case R.id.PopUpOn:
-                                                                   //Toast.makeText(getApplicationContext(),"Item 2 Selected",Toast.LENGTH_LONG).show();
+                                                                   //Toast.makeText(getApplicationContext(),"Item 2 Selected",Toast.LENGTH_SHORT).show();
                                                                    //new  HttpPOST_LoadDevices().execute(NumericUserId);
                                                                    PopUpOn(btnChangeName.getText().toString());
                                                                    return true;
@@ -651,7 +703,7 @@ public class MainActivity extends AppCompatActivity {
                 m_Text = input.getText().toString();
                 if(devices.containsKey(m_Text))
                 {
-                    Toast.makeText(getBaseContext(),"Device Name already selected. Please introduce another one." , Toast.LENGTH_LONG).show();
+                    Toast.makeText(getBaseContext(),"Device Name already selected. Please introduce another one." , Toast.LENGTH_SHORT).show();
 
                 }else
                 {
@@ -774,43 +826,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private String GET3(String url){
-
-        String response="";
-        try {
-            URL oracle = new URL(url);
-            URLConnection yc = oracle.openConnection();
-            BufferedReader in = new BufferedReader(new InputStreamReader(
-                    yc.getInputStream()));
-            String inputLine;
-            while ((inputLine = in.readLine()) != null)response += inputLine;
-                //System.out.println(inputLine);
-
-            in.close();
-        }
-        catch(MalformedURLException e){
-            response="malformedurl";
-            Log.d("MalformedURl", e.getLocalizedMessage());
-
-        }
-        catch (SocketTimeoutException e){
 
 
-            response = "timeout";
-            Log.d("Connection timed out", e.getLocalizedMessage());
-
-        }
-        catch(IOException e){
-
-
-            response = "ioexception";
-            Log.d("IOException",e.getLocalizedMessage());
-        }
-        return  response;
-
-    }
-
-    private String GET2(String url){
+    private static String GET2(String url){
 
         String response="";
 
@@ -868,17 +886,13 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-       public static String GET4(String url){
+    public static String GET4(String url){
         InputStream inputStream = null;
         String result = "";
         try {
 
-            // set the connection timeout value to .1 seconds
-            final HttpParams httpParams = new BasicHttpParams();
-            HttpConnectionParams.setConnectionTimeout(httpParams, TIME_OUT);
-
             // create HttpClient
-            HttpClient httpclient = new DefaultHttpClient(httpParams);
+            HttpClient httpclient = new DefaultHttpClient();
 
             // make GET request to the given URL
             HttpResponse httpResponse = httpclient.execute(new HttpGet(url));
@@ -894,7 +908,6 @@ public class MainActivity extends AppCompatActivity {
 
         } catch (Exception e) {
             Log.d("InputStream", e.getLocalizedMessage());
-            //Log.d("InputStream", "NO connection");
         }
 
         return result;
@@ -944,7 +957,7 @@ public class MainActivity extends AppCompatActivity {
         protected String doInBackground(String... urls) {
 
             ipAdd = urls[0];
-            return GET4(urls[0]);
+            return GET2(urls[0]);
         }
 
 
@@ -952,8 +965,8 @@ public class MainActivity extends AppCompatActivity {
         // onPostExecute displays the results of the AsyncTask.
         @Override
         protected void onPostExecute(String result) {
-            //Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_LONG).show();
-            //Toast.makeText(getBaseContext(), result, Toast.LENGTH_LONG).show();
+            //Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getBaseContext(), result, Toast.LENGTH_SHORT).show();
 
             progress.incrementProgressBy(1);
             if(progress.getMax() == progress.getProgress()){
@@ -970,7 +983,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if( hashmapContainsIP(ipAdd))
                 {
-                    Toast.makeText(getBaseContext(),"Device with IP "+ ipAdd +" already added", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getBaseContext(),"Device with IP "+ ipAdd +" already added", Toast.LENGTH_SHORT).show();
                 }
                 else {
 
@@ -1071,8 +1084,8 @@ public class MainActivity extends AppCompatActivity {
         // onPostExecute displays the results of the AsyncTask.
         @Override
         protected void onPostExecute(String result) {
-            //Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_LONG).show();
-            //Toast.makeText(getBaseContext(), result, Toast.LENGTH_LONG).show();
+            //Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getBaseContext(), result, Toast.LENGTH_SHORT).show();
 
 
             Log.d("State", result);
@@ -1097,8 +1110,8 @@ public class MainActivity extends AppCompatActivity {
         // onPostExecute displays the results of the AsyncTask.
         @Override
         protected void onPostExecute(String result) {
-            //Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_LONG).show();
-            //Toast.makeText(getBaseContext(), result, Toast.LENGTH_LONG).show();
+            //Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getBaseContext(), result, Toast.LENGTH_SHORT).show();
 
             if(result.equals("Changed to OFF")|| result.equals("Changed to ON")) {
                 Log.d("State", ipAdd + " " + result);
@@ -1207,13 +1220,39 @@ public class MainActivity extends AppCompatActivity {
         String url;
         String result="";
 
-        url = serverURL + "?GetDevices="+ NumUserId;
-        result = GET(url);
+        url = serverURL + "/?GetDevices="+ NumUserId;
+        Log.d("LoadDevices",url);
+        result = GET4(url);
 
 
+        /*
+        String response = "";
 
-        return  result;
+        HashMap<String, String> params = new HashMap<>();
+        params.put("GetDevices", NumUserId);
 
+        try {
+            //Consider next request:
+            HttpRequest req = new HttpRequest(serverURL);
+
+            response = req.preparePost().withData(params).sendAndReadString();
+        } catch (SocketTimeoutException e) {
+            //Toast.makeText(getBaseContext(), "Connection TimedOut", Toast.LENGTH_SHORT).show();
+            Log.d("connection", "timeout");
+        } catch (MalformedURLException e) {
+
+            Log.d("loadDevices","malformedurl");
+            response = e.getMessage();
+        } catch (IOException e) {
+            //   Toast.makeText(getBaseContext(), "Device Not Found", Toast.LENGTH_SHORT).show();
+            Log.d("loadDevices","ioexception");
+            response = e.getMessage();
+        }
+
+        return response;
+        */
+
+        return result;
     }
 
     //parses and sets the Devices from the http request
@@ -1260,11 +1299,12 @@ public class MainActivity extends AppCompatActivity {
 
             return LoadDevices(NumUserId);
         }
+
         // onPostExecute displays the results of the AsyncTask.
         @Override
         protected void onPostExecute(String result) {
-            Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_LONG).show();
-            //Toast.makeText(getBaseContext(), result, Toast.LENGTH_LONG).show();
+            Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getBaseContext(), result, Toast.LENGTH_SHORT).show();
             Log.d("Http Post Response:", result);
             SetDevices(result);
 
@@ -1339,6 +1379,10 @@ public class MainActivity extends AppCompatActivity {
     }
     */
 
+
+
+
+
     private String POST_ON_OFF_Device(String userId,String key, String command){
 
         //http://khansystems.com/clienteQuery/index.php?Update=000002999ON
@@ -1365,7 +1409,7 @@ public class MainActivity extends AppCompatActivity {
             response=e.getMessage();
         }
         catch (IOException e){
-            Toast.makeText(getBaseContext(), "Device Not Found", Toast.LENGTH_LONG).show();
+            Toast.makeText(getBaseContext(), "Device Not Found", Toast.LENGTH_SHORT).show();
             response=e.getMessage();
         }
 
@@ -1435,8 +1479,8 @@ public class MainActivity extends AppCompatActivity {
         // onPostExecute displays the results of the AsyncTask.
         @Override
         protected void onPostExecute(String result) {
-            //Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_LONG).show();
-            //Toast.makeText(getBaseContext(), result, Toast.LENGTH_LONG).show();
+            //Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getBaseContext(), result, Toast.LENGTH_SHORT).show();
             Log.d("d","https POST " +key);
 
 
@@ -1461,8 +1505,8 @@ public class MainActivity extends AppCompatActivity {
         // onPostExecute displays the results of the AsyncTask.
         @Override
         protected void onPostExecute(String result) {
-            //Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_LONG).show();
-            //Toast.makeText(getBaseContext(), result, Toast.LENGTH_LONG).show();
+            //Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getBaseContext(), result, Toast.LENGTH_SHORT).show();
 
 
         }
@@ -1531,6 +1575,32 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    private static class HttpCommand extends AsyncTask<String, Void, String> {
+
+
+
+
+
+        @Override
+        protected String doInBackground(String... urls) {
+
+
+            return GET2(urls[0]);
+        }
+        // onPostExecute displays the results of the AsyncTask.
+        @Override
+        protected void onPostExecute(String result) {
+            //Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getBaseContext(), result, Toast.LENGTH_SHORT).show();
+
+
+            Log.d("State", result);
+
+
+
+        }
+    }
+
 
 
     @Override
@@ -1556,11 +1626,11 @@ public class MainActivity extends AppCompatActivity {
 */
         switch (item.getItemId()) {
             case R.id.SaveDevices:
-                //Toast.makeText(getApplicationContext(),"Item 1 Selected",Toast.LENGTH_LONG).show();
+                //Toast.makeText(getApplicationContext(),"Item 1 Selected",Toast.LENGTH_SHORT).show();
                 RegisterDevicesConfirm();
                 return true;
             case R.id.LoadDevices:
-                //Toast.makeText(getApplicationContext(),"Item 2 Selected",Toast.LENGTH_LONG).show();
+                //Toast.makeText(getApplicationContext(),"Item 2 Selected",Toast.LENGTH_SHORT).show();
                 new  HttpPOST_LoadDevices().execute(NumericUserId);
                 return true;
             case R.id.WipeDevices:

@@ -42,6 +42,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.sourcey.materiallogindemo.MainActivity" />
         </activity>
+
+        <service android:name="com.sourcey.materiallogindemo.TimeService" />
     </application>
 
 </manifest>

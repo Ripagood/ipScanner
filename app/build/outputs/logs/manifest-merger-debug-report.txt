@@ -89,6 +89,10 @@ ADDED from AndroidManifest.xml:35:13
 		ADDED from AndroidManifest.xml:36:17
 	android:value
 		ADDED from AndroidManifest.xml:37:17
+service#com.sourcey.materiallogindemo.TimeService
+ADDED from AndroidManifest.xml:39:9
+	android:name
+		ADDED from AndroidManifest.xml:39:18
 uses-sdk
 INJECTED from AndroidManifest.xml:0:0 reason: use-sdk injection requested
 MERGED from com.android.support:appcompat-v7:22.2.0:20:5

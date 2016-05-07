@@ -35,6 +35,7 @@ public class LoginActivity extends AppCompatActivity {
     private static final String PREFS_NAME = "USER_INFORMATION";
     private int loginSuccess =0;
 
+    public static String NumericUserId="";
     ProgressDialog progressDialog;
 
     @Bind(R.id.input_email) EditText _emailText;
@@ -205,7 +206,7 @@ public class LoginActivity extends AppCompatActivity {
 
             String extracted;
 
-            final Pattern p = Pattern.compile("(\\d{6})" );
+            final Pattern p = Pattern.compile("(\\d{6,})" );
             final Matcher m = p.matcher( result );
             if ( m.find() ) {
                 extracted= m.group( 0 );
@@ -213,6 +214,8 @@ public class LoginActivity extends AppCompatActivity {
                 SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = prefs.edit();
                 editor.putString("NUMERIC_ID", extracted);
+                MainActivity.NumericUserId = extracted;
+                editor.commit(); //important, otherwise it wouldn't save.
                 Log.d("postexec","correct");
                 // correct authentication
                 onLoginSuccess();
@@ -244,9 +247,16 @@ public class LoginActivity extends AppCompatActivity {
             result=req.preparePost().withData(params).sendAndReadString();
         }
         catch( SocketTimeoutException e){
-            Log.d("ConnectionTimeOut",e.getLocalizedMessage());
-            Toast.makeText(getBaseContext(), "Connection Time out" , Toast.LENGTH_LONG).show();
+            Log.d("ConnectionTimeOut", e.getLocalizedMessage());
+            //Toast.makeText(LoginActivity.this, "Connection Time out" , Toast.LENGTH_LONG).show();
 
+            runOnUiThread(new Runnable()
+            {
+                public void run()
+                {
+                    Toast.makeText(getApplicationContext(), "Connection Time out", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
         catch(MalformedURLException e){
             Log.d("MalformedURl",e.getLocalizedMessage());
