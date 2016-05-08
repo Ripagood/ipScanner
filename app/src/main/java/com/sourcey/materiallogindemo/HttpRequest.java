@@ -39,6 +39,9 @@ import org.json.JSONObject;
  *req.preparePost().withData(params).sendAndReadJSON();
  */
 public class HttpRequest {
+
+    private final int TIMEOUT=5000;
+
     private URL url;
     private HttpURLConnection con;
     private OutputStream os;
@@ -66,7 +69,7 @@ public class HttpRequest {
         if(isPost)con.setRequestMethod("POST");
         con.setDoOutput(true);
         con.setDoInput(true);
-        con.setConnectTimeout(1000);
+        con.setConnectTimeout(TIMEOUT);
         os = con.getOutputStream();
     }
     //prepare request in GET method

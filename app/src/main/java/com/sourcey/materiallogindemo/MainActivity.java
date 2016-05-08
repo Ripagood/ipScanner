@@ -34,20 +34,12 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
+
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
+
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
-import org.apache.http.util.EntityUtils;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -57,22 +49,17 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
+
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
-import java.net.URI;
-import java.net.URL;
-import java.net.URLConnection;
+
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
-import butterknife.Bind;
+import java.util.concurrent.TimeoutException;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -141,13 +128,13 @@ public class MainActivity extends AppCompatActivity {
         NumericUserId = prefs.getString("NUMERIC_ID", "");
 
 
-        Log.d("numeric_id",NumericUserId);
+        Log.d("numeric_id", NumericUserId);
 
         loadHashMap();
         printDevices2();
 
 
-        startService(new Intent(this, TimeService.class));
+        //startService(new Intent(this, TimeService.class));
 
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
@@ -910,6 +897,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d("InputStream", e.getLocalizedMessage());
         }
 
+
         return result;
     }
 
@@ -1116,6 +1104,7 @@ public class MainActivity extends AppCompatActivity {
             if(result.equals("Changed to OFF")|| result.equals("Changed to ON")) {
                 Log.d("State", ipAdd + " " + result);
             }
+            Toast.makeText(getBaseContext(), result, Toast.LENGTH_SHORT).show();
 
 
         }
@@ -1327,6 +1316,17 @@ public class MainActivity extends AppCompatActivity {
             result=req.preparePost().withData(params).sendAndReadString();
         }
         catch( SocketTimeoutException e){
+            runOnUiThread(new Runnable(){
+
+                @Override
+                public void run(){
+                    //update ui here
+                    // display toast here
+                    Toast.makeText(MainActivity.this, "Connection TimedOut", Toast.LENGTH_SHORT).show();
+                }
+            });
+            //
+            Log.d("connection","timeout");
             Log.d("ConnectionTimeOut",e.getLocalizedMessage());
 
         }
@@ -1339,48 +1339,6 @@ public class MainActivity extends AppCompatActivity {
         Log.d("Http Post Response:", result);
         return result;
     }
-
-    /*
-    private String RegisterDevice( String NickName, String key){
-
-        String result="";
-
-        HttpClient httpClient = new DefaultHttpClient();
-        HttpPost httpPost = new HttpPost(serverURL);
-
-        List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(3);
-        nameValuePair.add(new BasicNameValuePair("AddDevice", key));
-        nameValuePair.add(new BasicNameValuePair("NickName", NickName));
-        nameValuePair.add(new BasicNameValuePair("User", UserId));
-
-        //Encoding POST data
-        try {
-            httpPost.setEntity(new UrlEncodedFormEntity(nameValuePair));
-
-        } catch (UnsupportedEncodingException e)
-        {
-            e.printStackTrace();
-        }
-
-        try {
-            HttpResponse response = httpClient.execute(httpPost);
-            // write response to log
-            result = response.toString();
-            Log.d("Http Post Response:", result);
-        } catch (ClientProtocolException e) {
-            // Log exception
-            e.printStackTrace();
-        } catch (IOException e) {
-            // Log exception
-            e.printStackTrace();
-        }
-
-        return  result;
-    }
-    */
-
-
-
 
 
     private String POST_ON_OFF_Device(String userId,String key, String command){
@@ -1401,15 +1359,43 @@ public class MainActivity extends AppCompatActivity {
             response= req.preparePost().withData(params).sendAndReadString();
         }
         catch(SocketTimeoutException e){
-            //Toast.makeText(getBaseContext(), "Connection TimedOut", Toast.LENGTH_SHORT).show();
+            runOnUiThread(new Runnable(){
+
+                @Override
+                public void run(){
+                    //update ui here
+                    // display toast here
+                    Toast.makeText(MainActivity.this, "Connection TimedOut", Toast.LENGTH_SHORT).show();
+                }
+            });
+            //
             Log.d("connection","timeout");
         }
         catch (MalformedURLException e){
 
+            runOnUiThread(new Runnable(){
+
+                @Override
+                public void run(){
+                    //update ui here
+                    // display toast here
+                    Toast.makeText(MainActivity.this, "Malformed URL", Toast.LENGTH_SHORT).show();
+                }
+            });
+
             response=e.getMessage();
         }
         catch (IOException e){
-            Toast.makeText(getBaseContext(), "Device Not Found", Toast.LENGTH_SHORT).show();
+            //
+            runOnUiThread(new Runnable(){
+
+                @Override
+                public void run(){
+                    //update ui here
+                    // display toast here
+                    Toast.makeText(getBaseContext(), "Device Not Found", Toast.LENGTH_SHORT).show();
+                }
+            });
             response=e.getMessage();
         }
 
@@ -1576,10 +1562,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     private static class HttpCommand extends AsyncTask<String, Void, String> {
-
-
-
-
 
         @Override
         protected String doInBackground(String... urls) {
