@@ -53,6 +53,15 @@
             android:padding="12dp"
             android:text="Login"/>
 
+        <android.support.v7.widget.AppCompatButton
+            android:id="@+id/btn_SkipLogin"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="24dp"
+            android:padding="12dp"
+            android:text="Skip Login"/>
+
         <TextView android:id="@+id/link_signup"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"

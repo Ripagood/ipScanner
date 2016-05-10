@@ -14,14 +14,17 @@ public class LoginActivity$$ViewBinder<T extends com.sourcey.materiallogindemo.L
     target._passwordText = finder.castView(view, 2131492968, "field '_passwordText'");
     view = finder.findRequiredView(source, 2131492969, "field '_loginButton'");
     target._loginButton = finder.castView(view, 2131492969, "field '_loginButton'");
-    view = finder.findRequiredView(source, 2131492970, "field '_signupLink'");
-    target._signupLink = finder.castView(view, 2131492970, "field '_signupLink'");
+    view = finder.findRequiredView(source, 2131492970, "field '_SkiplLoginButton'");
+    target._SkiplLoginButton = finder.castView(view, 2131492970, "field '_SkiplLoginButton'");
+    view = finder.findRequiredView(source, 2131492971, "field '_signupLink'");
+    target._signupLink = finder.castView(view, 2131492971, "field '_signupLink'");
   }
 
   @Override public void unbind(T target) {
     target._emailText = null;
     target._passwordText = null;
     target._loginButton = null;
+    target._SkiplLoginButton = null;
     target._signupLink = null;
   }
 }

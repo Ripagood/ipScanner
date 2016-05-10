@@ -1,7 +1,9 @@
 package com.sourcey.materiallogindemo;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -9,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import android.content.Intent;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -35,12 +38,15 @@ public class LoginActivity extends AppCompatActivity {
     private static final String PREFS_NAME = "USER_INFORMATION";
     private int loginSuccess =0;
 
+    public AsyncTask loginTask;
+
     public static String NumericUserId="";
     ProgressDialog progressDialog;
 
     @Bind(R.id.input_email) EditText _emailText;
     @Bind(R.id.input_password) EditText _passwordText;
     @Bind(R.id.btn_login) Button _loginButton;
+    @Bind(R.id.btn_SkipLogin) Button _SkiplLoginButton;
     @Bind(R.id.link_signup) TextView _signupLink;
     
     @Override
@@ -55,6 +61,14 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
                 login();
             }
+        });
+
+        _SkiplLoginButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                SkipLogin();
+            }
+
         });
 
         _signupLink.setOnClickListener(new View.OnClickListener() {
@@ -95,6 +109,16 @@ public class LoginActivity extends AppCompatActivity {
                 R.style.AppTheme_Dark_Dialog);
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage("Authenticating...");
+        progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                _loginButton.setEnabled(true);
+                loginTask.cancel(true);
+                //kill the async task in case it is running
+
+            }
+        });
+
         progressDialog.show();
 
         String email = _emailText.getText().toString();
@@ -109,7 +133,7 @@ public class LoginActivity extends AppCompatActivity {
         editor.putString("PASSWORD", password);
         editor.commit(); //important, otherwise it wouldn't save.
 
-        new HttpLogin().execute(email,password);
+        loginTask = new HttpLogin().execute(email, password);
 
 
 
@@ -126,6 +150,52 @@ public class LoginActivity extends AppCompatActivity {
                         progressDialog.dismiss();
                     }
                 }, 3000);*/
+    }
+
+    public void SkipLogin(){
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Skip Login");
+        builder.setMessage("Are you sure you want to skip login? You won't be able to synchronize to" +
+                " the cloud");
+
+
+// Set up the buttons
+        builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+               //Login and clear important variables
+                MainActivity.NumericUserId="";
+                MainActivity.UserId="";
+                MainActivity.UserPassword="";
+
+                SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putString("LOGIN", "FALSE");
+                editor.commit(); //important, otherwise it wouldn't save.
+
+                Log.d("LAN","nouser_pass_id");
+                // correct authentication
+                finish();
+
+            }
+        });
+        builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        //builder.show();
+        AlertDialog dialog = builder.show();
+        TextView messageText = (TextView)dialog.findViewById(android.R.id.message);
+        messageText.setGravity(Gravity.CENTER);
+        dialog.show();
+
+
+
     }
 
 
@@ -149,6 +219,10 @@ public class LoginActivity extends AppCompatActivity {
 
     public void onLoginSuccess() {
         _loginButton.setEnabled(true);
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("LOGIN","TRUE");
+        editor.commit(); //important, otherwise it wouldn't save.
         finish();
     }
 
@@ -190,6 +264,12 @@ public class LoginActivity extends AppCompatActivity {
         private String Password;
 
 
+        @Override
+        protected void onCancelled(){
+
+            //Do nothing?
+
+        }
 
         @Override
         protected String doInBackground(String... urls) {

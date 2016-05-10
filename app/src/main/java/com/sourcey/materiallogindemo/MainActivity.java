@@ -67,6 +67,8 @@ public class MainActivity extends AppCompatActivity {
     //name of the saved used id var
     private static final String PREFS_NAME = "USER_INFORMATION";
 
+    public String LOGIN="";
+
     //Time out for the HTTP request
     //do not go under 500ms
     static final int  TIME_OUT =  1000;
@@ -122,22 +124,31 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, 0);
+
         UserId = prefs.getString("USER_ID", "");
         UserPassword = prefs.getString("PASSWORD","");
         NumericUserId = prefs.getString("NUMERIC_ID", "");
+        LOGIN = prefs.getString("LOGIN","");
 
-
+        Log.d("user_id",UserId);
+        Log.d("password",UserPassword);
         Log.d("numeric_id", NumericUserId);
+        Log.d("LoginState", LOGIN);
 
         loadHashMap();
         printDevices2();
-
 
         //startService(new Intent(this, TimeService.class));
 
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
+        Log.d("afterLogin", "activity");
+
+
+
+
 
 
     }
@@ -1589,6 +1600,42 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
+
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu (Menu menu) {
+
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, 0);
+        LOGIN = prefs.getString("LOGIN","");
+
+
+        //These items should not be usable if the user logins without
+        //authentication
+        MenuItem SaveDev = menu.findItem(R.id.SaveDevices);
+        MenuItem LoadDev = menu.findItem(R.id.LoadDevices);
+        MenuItem WipeDev = menu.findItem(R.id.WipeDevices);
+
+        if ( LOGIN.equals("FALSE"))
+        {
+            SaveDev.setEnabled(false);
+            LoadDev.setEnabled(false);
+            WipeDev.setEnabled(false);
+
+        }else if( LOGIN.equals("TRUE"))
+        {
+            SaveDev.setEnabled(true);
+            LoadDev.setEnabled(true);
+            WipeDev.setEnabled(true);
+        }else
+        {
+            /*Nothing to do*/
+            /*     MISRA   */
+
+        }
+
         return true;
     }
 
