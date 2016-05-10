@@ -143,7 +143,8 @@ public class MainActivity extends AppCompatActivity {
         //startService(new Intent(this, TimeService.class));
 
         Intent intent = new Intent(this, LoginActivity.class);
-        startActivity(intent);
+       // startActivity(intent);
+        startActivityForResult(intent, 0);
         Log.d("afterLogin", "activity");
 
 
@@ -1637,6 +1638,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        invalidateOptionsMenu();
+        Log.d("login","result");
     }
 
     @Override
