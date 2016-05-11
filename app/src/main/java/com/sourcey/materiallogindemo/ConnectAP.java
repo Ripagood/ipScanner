@@ -62,6 +62,8 @@ public class ConnectAP extends AppCompatActivity {
     //do not go under 500ms
     static final int  TIME_OUT =  1000;
 
+    private ProgressDialog setupPD;
+
 
     private ProgressDialog pd;
 
@@ -96,6 +98,29 @@ public class ConnectAP extends AppCompatActivity {
                 WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
         mainWifi.startScan();
 
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("AP Connection");
+        builder.setMessage("Boot your device in AP mode and select it from the list here, if the " +
+                "device is not visible it will not be shown. Then input your network's credentials");
+
+
+// Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                //Nothing to do, continue with the activity and close the alert dialog
+            }
+        });
+
+
+        //builder.show();
+        AlertDialog dialog = builder.show();
+        TextView messageText = (TextView)dialog.findViewById(android.R.id.message);
+        messageText.setGravity(Gravity.CENTER);
+        dialog.show();
+
+
 
 
     }
@@ -105,8 +130,8 @@ public class ConnectAP extends AppCompatActivity {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Select your home network and input your password");
-       //builder.setMessage("Select your home network and input your password");
-       //IMPORTANT DONT USE SET MESSAGE OR ITEMS WONT DISPLAY
+        //builder.setMessage("Select your home network and input your password");
+        //IMPORTANT DONT USE SET MESSAGE OR ITEMS WONT DISPLAY
         list = ssids.split(";");
         //retrieve ssids
 
@@ -225,7 +250,7 @@ public class ConnectAP extends AppCompatActivity {
             }
         }
 
-       waitForConnection();
+        waitForConnection();
 
 
     }
@@ -348,7 +373,7 @@ public class ConnectAP extends AppCompatActivity {
 
     private void sendPasswordToDevice(String ssid,String password){
         final String deviceIP ="http://192.168.4.1/setting?";
-       // 192.168.4.1/setting?ssid=xxxxx&pas=yyyyy
+        // 192.168.4.1/setting?ssid=xxxxx&pas=yyyyy
 
 
         new HttpCommandSendPassword().execute(deviceIP + "ssid=" + ssid + "&" + "pass=" +password);
@@ -453,6 +478,11 @@ public class ConnectAP extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onDestroy() {
+        unregisterReceiver(receiverWifi);
+        super.onDestroy();
+    }
 
 
     @Override
@@ -529,8 +559,8 @@ public class ConnectAP extends AppCompatActivity {
             }
             */
             printAPs();
-           // mainText.setText(sb);
-           // Log.d("Button PressedName", sb.toString());
+            // mainText.setText(sb);
+            // Log.d("Button PressedName", sb.toString());
         }
     }
 }

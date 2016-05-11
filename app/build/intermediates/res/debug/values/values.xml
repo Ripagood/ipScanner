@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
     <eat-comment/>
     <attr format="reference" name="drawerArrowStyle"/>
     <attr format="dimension" name="height"/>
@@ -17,27 +17,27 @@
     <color name="abc_search_url_text_normal">#7fa87f</color>
     <color name="abc_search_url_text_pressed">@android:color/black</color>
     <color name="abc_search_url_text_selected">@android:color/black</color>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/src/main/res/values/colors.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/src/main/res/values/colors.xml -->
     <eat-comment/>
     <color name="accent">#FFFFFF</color>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
     <eat-comment/>
     <color name="accent_material_dark">@color/material_deep_teal_200</color>
     <color name="accent_material_light">@color/material_deep_teal_500</color>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/src/main/res/values/colors.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/src/main/res/values/colors.xml -->
     <eat-comment/>
     <color name="aluminum">#999999</color>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
     <eat-comment/>
     <color name="background_floating_material_dark">#ff424242</color>
     <color name="background_floating_material_light">#ffeeeeee</color>
     <color name="background_material_dark">#ff303030</color>
     <color name="background_material_light">#ffeeeeee</color>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/src/main/res/values/colors.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/src/main/res/values/colors.xml -->
     <eat-comment/>
     <color name="base">#AAAAAA</color>
     <color name="black">#000000</color>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
     <eat-comment/>
     <color name="bright_foreground_disabled_material_dark">#80ffffff</color>
     <color name="bright_foreground_disabled_material_light">#80000000</color>
@@ -51,25 +51,25 @@
     <color name="dim_foreground_disabled_material_light">#80323232</color>
     <color name="dim_foreground_material_dark">#ffbebebe</color>
     <color name="dim_foreground_material_light">#ff323232</color>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/build/intermediates/exploded-aar/com.android.support/design/22.2.0/res/values/values.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/build/intermediates/exploded-aar/com.android.support/design/22.2.0/res/values/values.xml -->
     <eat-comment/>
     <color name="error_color">#FFDD2C00</color>
     <color name="fab_stroke_end_inner_color">#0A000000</color>
     <color name="fab_stroke_end_outer_color">#0F000000</color>
     <color name="fab_stroke_top_inner_color">#1AFFFFFF</color>
     <color name="fab_stroke_top_outer_color">#2EFFFFFF</color>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
     <eat-comment/>
     <color name="highlighted_text_material_dark">#6680cbc4</color>
     <color name="highlighted_text_material_light">#66009688</color>
     <color name="hint_foreground_material_dark">@color/bright_foreground_disabled_material_dark</color>
     <color name="hint_foreground_material_light">@color/bright_foreground_disabled_material_light</color>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/src/main/res/values/colors.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/src/main/res/values/colors.xml -->
     <eat-comment/>
     <color name="iron">#CCCCCC</color>
     <color name="jet">#222222</color>
     <color name="jumbo">#888888</color>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
     <eat-comment/>
     <color name="link_text_material_dark">@color/material_deep_teal_200</color>
     <color name="link_text_material_light">@color/material_deep_teal_500</color>
@@ -78,20 +78,20 @@
     <color name="material_blue_grey_950">#ff21272b</color>
     <color name="material_deep_teal_200">#ff80cbc4</color>
     <color name="material_deep_teal_500">#ff009688</color>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/src/main/res/values/colors.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/src/main/res/values/colors.xml -->
     <eat-comment/>
     <color name="monsoon">#777777</color>
     <color name="oil">#333333</color>
     <color name="primary">#E43F3F</color>
     <color name="primary_dark">#E12929</color>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
     <eat-comment/>
     <color name="primary_dark_material_dark">#ff000000</color>
     <color name="primary_dark_material_light">#ff757575</color>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/src/main/res/values/colors.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/src/main/res/values/colors.xml -->
     <eat-comment/>
     <color name="primary_darker">#CC1D1D</color>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
     <eat-comment/>
     <color name="primary_material_dark">#ff212121</color>
     <color name="primary_material_light">#ffefefef</color>
@@ -105,19 +105,19 @@
     <color name="secondary_text_default_material_light">#8a000000</color>
     <color name="secondary_text_disabled_material_dark">#36ffffff</color>
     <color name="secondary_text_disabled_material_light">#24000000</color>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/build/intermediates/exploded-aar/com.android.support/design/22.2.0/res/values/values.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/build/intermediates/exploded-aar/com.android.support/design/22.2.0/res/values/values.xml -->
     <eat-comment/>
     <color name="shadow_end_color">@android:color/transparent</color>
     <color name="shadow_mid_color">#14000000</color>
     <color name="shadow_start_color">#44000000</color>
     <color name="snackbar_background_color">#323232</color>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
     <eat-comment/>
     <color name="switch_thumb_disabled_material_dark">#ff616161</color>
     <color name="switch_thumb_disabled_material_light">#ffbdbdbd</color>
     <color name="switch_thumb_normal_material_dark">#ffbdbdbd</color>
     <color name="switch_thumb_normal_material_light">#fff1f1f1</color>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/src/main/res/values/colors.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/src/main/res/values/colors.xml -->
     <eat-comment/>
     <color name="white">#FFFFFF</color>
     <declare-styleable name="ActionBar"><attr name="navigationMode"><enum name="normal" value="0"/><enum name="listMode" value="1"/><enum name="tabMode" value="2"/></attr><attr name="displayOptions"><flag name="none" value="0"/><flag name="useLogo" value="0x1"/><flag name="showHome" value="0x2"/><flag name="homeAsUp" value="0x4"/><flag name="showTitle" value="0x8"/><flag name="showCustom" value="0x10"/><flag name="disableHome" value="0x20"/></attr><attr name="title"/><attr format="string" name="subtitle"/><attr format="reference" name="titleTextStyle"/><attr format="reference" name="subtitleTextStyle"/><attr format="reference" name="icon"/><attr format="reference" name="logo"/><attr format="reference" name="divider"/><attr format="reference" name="background"/><attr format="reference|color" name="backgroundStacked"/><attr format="reference|color" name="backgroundSplit"/><attr format="reference" name="customNavigationLayout"/><attr name="height"/><attr format="reference" name="homeLayout"/><attr format="reference" name="progressBarStyle"/><attr format="reference" name="indeterminateProgressStyle"/><attr format="dimension" name="progressBarPadding"/><attr name="homeAsUpIndicator"/><attr format="dimension" name="itemPadding"/><attr format="boolean" name="hideOnContentScroll"/><attr format="dimension" name="contentInsetStart"/><attr format="dimension" name="contentInsetEnd"/><attr format="dimension" name="contentInsetLeft"/><attr format="dimension" name="contentInsetRight"/><attr format="dimension" name="elevation"/><attr format="reference" name="popupTheme"/></declare-styleable>
@@ -158,7 +158,7 @@
     <declare-styleable name="Toolbar"><attr format="reference" name="titleTextAppearance"/><attr format="reference" name="subtitleTextAppearance"/><attr name="title"/><attr name="subtitle"/><attr name="android:gravity"/><attr format="dimension" name="titleMargins"/><attr format="dimension" name="titleMarginStart"/><attr format="dimension" name="titleMarginEnd"/><attr format="dimension" name="titleMarginTop"/><attr format="dimension" name="titleMarginBottom"/><attr name="contentInsetStart"/><attr name="contentInsetEnd"/><attr name="contentInsetLeft"/><attr name="contentInsetRight"/><attr format="dimension" name="maxButtonHeight"/><attr format="reference" name="collapseIcon"/><attr format="string" name="collapseContentDescription"/><attr name="popupTheme"/><attr format="reference" name="navigationIcon"/><attr format="string" name="navigationContentDescription"/><attr name="android:minHeight"/></declare-styleable>
     <declare-styleable name="View"><attr format="dimension" name="paddingStart"/><attr format="dimension" name="paddingEnd"/><attr name="android:focusable"/><attr format="reference" name="theme"/><attr name="android:theme"/><attr format="color" name="backgroundTint"/><attr name="backgroundTintMode"><enum name="src_over" value="3"/><enum name="src_in" value="5"/><enum name="src_atop" value="9"/><enum name="multiply" value="14"/><enum name="screen" value="15"/></attr></declare-styleable>
     <declare-styleable name="ViewStubCompat"><attr name="android:layout"/><attr name="android:inflatedId"/><attr name="android:id"/></declare-styleable>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
     <eat-comment/>
     <dimen name="abc_action_bar_content_inset_material">16dp</dimen>
     <dimen name="abc_action_bar_default_height_material">56dp</dimen>
@@ -220,14 +220,14 @@
     <dimen name="abc_text_size_subtitle_material_toolbar">16dp</dimen>
     <dimen name="abc_text_size_title_material">20sp</dimen>
     <dimen name="abc_text_size_title_material_toolbar">20dp</dimen>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/src/main/res/values/dimens.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/src/main/res/values/dimens.xml -->
     <eat-comment/>
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/build/intermediates/exploded-aar/com.android.support/design/22.2.0/res/values/values.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/build/intermediates/exploded-aar/com.android.support/design/22.2.0/res/values/values.xml -->
     <eat-comment/>
     <dimen name="appbar_elevation">4dp</dimen>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
     <eat-comment/>
     <item name="dialog_fixed_height_major" type="dimen">80%</item>
     <item name="dialog_fixed_height_minor" type="dimen">100%</item>
@@ -235,7 +235,7 @@
     <item name="dialog_fixed_width_minor" type="dimen">320dp</item>
     <item format="float" name="disabled_alpha_material_dark" type="dimen">0.30</item>
     <item format="float" name="disabled_alpha_material_light" type="dimen">0.26</item>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/build/intermediates/exploded-aar/com.android.support/design/22.2.0/res/values/values.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/build/intermediates/exploded-aar/com.android.support/design/22.2.0/res/values/values.xml -->
     <eat-comment/>
     <dimen name="fab_border_width">0.5dp</dimen>
     <dimen name="fab_content_size">24dp</dimen>
@@ -250,12 +250,12 @@
     <dimen name="navigation_padding_bottom">8dp</dimen>
     <dimen name="navigation_padding_top_default">0dp</dimen>
     <dimen name="navigation_separator_vertical_padding">8dp</dimen>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
     <eat-comment/>
     <dimen name="notification_large_icon_height">64dp</dimen>
     <dimen name="notification_large_icon_width">64dp</dimen>
     <dimen name="notification_subtext_size">12dp</dimen>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/build/intermediates/exploded-aar/com.android.support/design/22.2.0/res/values/values.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/build/intermediates/exploded-aar/com.android.support/design/22.2.0/res/values/values.xml -->
     <eat-comment/>
     <dimen name="snackbar_action_inline_max_width">128dp</dimen>
     <dimen name="snackbar_background_corner_radius">0dp</dimen>
@@ -269,7 +269,7 @@
     <dimen name="snackbar_text_size">14sp</dimen>
     <dimen name="tab_max_width">264dp</dimen>
     <dimen name="tab_min_width">72dp</dimen>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
     <eat-comment/>
     <drawable name="notification_template_icon_bg">#3333B5E5</drawable>
     <item name="action_bar_activity_content" type="id"/>
@@ -281,19 +281,19 @@
     <item name="progress_horizontal" type="id"/>
     <item name="split_action_bar" type="id"/>
     <item name="up" type="id"/>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/build/intermediates/exploded-aar/com.android.support/design/22.2.0/res/values/values.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/build/intermediates/exploded-aar/com.android.support/design/22.2.0/res/values/values.xml -->
     <eat-comment/>
     <item name="view_offset_helper" type="id"/>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
     <eat-comment/>
     <integer name="abc_config_activityDefaultDur">220</integer>
     <integer name="abc_config_activityShortDur">150</integer>
     <integer name="abc_max_action_buttons">2</integer>
     <integer name="cancel_button_image_alpha">127</integer>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/build/intermediates/exploded-aar/com.android.support/design/22.2.0/res/values/values.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/build/intermediates/exploded-aar/com.android.support/design/22.2.0/res/values/values.xml -->
     <eat-comment/>
     <integer name="snackbar_text_max_lines">2</integer>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
     <eat-comment/>
     <integer name="status_bar_notification_info_maxnum">999</integer>
     <string name="abc_action_bar_home_description">Navigate home</string>
@@ -313,29 +313,29 @@
     <string name="abc_shareactionprovider_share_with">Share with</string>
     <string name="abc_shareactionprovider_share_with_application">Share with %s</string>
     <string name="abc_toolbar_collapse_description">Collapse</string>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/src/main/res/values/strings.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/src/main/res/values/strings.xml -->
     <eat-comment/>
     <string name="action_settings">Delete Settings</string>
     <string name="app_name">Material Login Example</string>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/build/intermediates/exploded-aar/com.android.support/design/22.2.0/res/values/values.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/build/intermediates/exploded-aar/com.android.support/design/22.2.0/res/values/values.xml -->
     <eat-comment/>
     <string name="appbar_scrolling_view_behavior" translatable="false">android.support.design.widget.AppBarLayout$ScrollingViewBehavior</string>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/src/main/res/values/strings.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/src/main/res/values/strings.xml -->
     <eat-comment/>
     <string name="hello_world">Hello world!</string>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
     <eat-comment/>
     <string name="status_bar_notification_info_overflow">999+</string>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/src/main/res/values/strings.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/src/main/res/values/strings.xml -->
     <eat-comment/>
     <string name="title_activity_connect_ap">ConnectAP</string>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
     <eat-comment/>
     <style name="AlertDialog.AppCompat" parent="Base.AlertDialog.AppCompat"/>
     <style name="AlertDialog.AppCompat.Light" parent="Base.AlertDialog.AppCompat.Light"/>
     <style name="Animation.AppCompat.Dialog" parent="Base.Animation.AppCompat.Dialog"/>
     <style name="Animation.AppCompat.DropDownUp" parent="Base.Animation.AppCompat.DropDownUp"/>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/src/main/res/values/styles.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/src/main/res/values/styles.xml -->
     <eat-comment/>
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
@@ -360,7 +360,7 @@
         <item name="android:textColorPrimary">@color/iron</item>
         <item name="android:background">@color/primary</item>
     </style>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
     <eat-comment/>
     <style name="Base.AlertDialog.AppCompat" parent="android:Widget">
         <item name="android:layout">@layout/abc_alert_dialog_material</item>
@@ -1276,7 +1276,7 @@
         <item name="android:scaleType">center</item>
         <item name="android:background">?attr/selectableItemBackground</item>
     </style>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/build/intermediates/exploded-aar/com.android.support/design/22.2.0/res/values/values.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/build/intermediates/exploded-aar/com.android.support/design/22.2.0/res/values/values.xml -->
     <eat-comment/>
     <style name="Base.Widget.Design.TabLayout" parent="android:Widget">
         <item name="tabMaxWidth">@dimen/tab_max_width</item>
@@ -1288,7 +1288,7 @@
         <item name="tabTextAppearance">@style/TextAppearance.Design.Tab</item>
         <item name="tabSelectedTextColor">?android:textColorPrimary</item>
     </style>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
     <eat-comment/>
     <style name="Platform.AppCompat" parent="android:Theme">
         <item name="android:windowNoTitle">true</item>
@@ -1487,7 +1487,7 @@
     </style>
     <style name="TextAppearance.AppCompat.Widget.Switch" parent="Base.TextAppearance.AppCompat.Widget.Switch"/>
     <style name="TextAppearance.AppCompat.Widget.TextView.SpinnerItem" parent="Base.TextAppearance.AppCompat.Widget.TextView.SpinnerItem"/>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/build/intermediates/exploded-aar/com.android.support/design/22.2.0/res/values/values.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/build/intermediates/exploded-aar/com.android.support/design/22.2.0/res/values/values.xml -->
     <eat-comment/>
     <style name="TextAppearance.Design.Error" parent="TextAppearance.AppCompat.Caption">
         <item name="android:textColor">@color/error_color</item>
@@ -1507,7 +1507,7 @@
         <item name="android:textColor">?android:textColorSecondary</item>
         <item name="textAllCaps">true</item>
     </style>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/res/values/values.xml -->
     <eat-comment/>
     <style name="TextAppearance.StatusBar.EventContent" parent=""/>
     <style name="TextAppearance.StatusBar.EventContent.Info" parent=""/>
@@ -1638,7 +1638,7 @@
     <style name="Widget.AppCompat.TextView.SpinnerItem" parent="Base.Widget.AppCompat.TextView.SpinnerItem"/>
     <style name="Widget.AppCompat.Toolbar" parent="Base.Widget.AppCompat.Toolbar"/>
     <style name="Widget.AppCompat.Toolbar.Button.Navigation" parent="RtlOverlay.Widget.AppCompat.Toolbar.Button.Navigation"/>
-    <!-- From: file:/home/elias/Projects/materiallogindemo/app/build/intermediates/exploded-aar/com.android.support/design/22.2.0/res/values/values.xml -->
+    <!-- From: file:/home/elias/Projects/ip/ipScanner/app/build/intermediates/exploded-aar/com.android.support/design/22.2.0/res/values/values.xml -->
     <eat-comment/>
     <style name="Widget.Design.AppBarLayout" parent="android:Widget">
         <item name="elevation">@dimen/appbar_elevation</item>

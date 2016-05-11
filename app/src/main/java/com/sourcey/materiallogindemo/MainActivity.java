@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
     // name: NIckName , value = ip, key
 
     Integer numericDC;
-   static  String deviceDutyCycle;
+    static  String deviceDutyCycle;
     static String deviceIp;
     static String deviceKey;
     static String deviceNickName;
@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
         //startService(new Intent(this, TimeService.class));
 
         Intent intent = new Intent(this, LoginActivity.class);
-       // startActivity(intent);
+        // startActivity(intent);
         startActivityForResult(intent, 0);
         Log.d("afterLogin", "activity");
 
@@ -558,7 +558,7 @@ public class MainActivity extends AppCompatActivity {
         TextView messageText = (TextView)dialog.findViewById(android.R.id.message);
         messageText.setGravity(Gravity.CENTER);
         dialog.show();
-       // builder.show();
+        // builder.show();
 
 
 
@@ -663,8 +663,8 @@ public class MainActivity extends AppCompatActivity {
         addresses = devices.get(key);
 
         popDialog.setMessage("IP: "+ addresses[0]+ "\n"+
-                             "Intensity: "+ addresses[2]+ "\n"+
-                              "Key: "+ addresses[1]);
+                "Intensity: "+ addresses[2]+ "\n"+
+                "Key: "+ addresses[1]);
         // Button OK
         popDialog.setPositiveButton("OK",
                 new DialogInterface.OnClickListener() {
@@ -1642,8 +1642,41 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        //change menu
         invalidateOptionsMenu();
+        //disable connect to server button
+        //pressing the button toggles the text and the function
+        final Button btn = (Button) findViewById(R.id.ButtonConnection);
+
+
+
+
+
         Log.d("login","result");
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, 0);
+
+        UserId = prefs.getString("USER_ID", "");
+        UserPassword = prefs.getString("PASSWORD","");
+        NumericUserId = prefs.getString("NUMERIC_ID", "");
+        LOGIN = prefs.getString("LOGIN","");
+
+        if(LOGIN.equals("TRUE"))
+        {
+            btn.setEnabled(true);
+
+        }else if (LOGIN.equals("FALSE"))
+        {
+            btn.setEnabled(false);
+        }else
+        {
+
+        }
+
+        Log.d("user_id",UserId);
+        Log.d("password",UserPassword);
+        Log.d("numeric_id", NumericUserId);
+        Log.d("LoginState", LOGIN);
     }
 
     @Override
@@ -1685,7 +1718,7 @@ public class MainActivity extends AppCompatActivity {
                 //DELETES LOCAL SETTINGS
                 //WipeSettings();
                 //deleteHashMap();
-               StartActivityConnectAP();
+                StartActivityConnectAP();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
