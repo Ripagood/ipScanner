@@ -1712,7 +1712,9 @@ public class MainActivity extends AppCompatActivity {
                 //DELETES LOCAL SETTINGS
                 //WipeSettings();
                 //deleteHashMap();
-                WipeSettingsConfirm();
+                //WipeSettingsConfirm();
+                Intent i = new Intent(this, MyPreferencesActivity.class);
+                startActivity(i);
                 return true;
             case R.id.ConnectAP:
                 //DELETES LOCAL SETTINGS
