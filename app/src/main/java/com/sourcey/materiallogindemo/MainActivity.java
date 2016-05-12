@@ -15,6 +15,7 @@ import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.internal.view.ContextThemeWrapper;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.util.Log;
@@ -271,6 +272,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void printDevices2(){
 
+       // ContextThemeWrapper newContext = new ContextThemeWrapper(context, R.style.AppTheme_Button);
         //select the linear layout defined in the xml
 
         //final LinearLayout lm = (LinearLayout) findViewById(R.id.linearLayoutMain);
@@ -294,7 +296,7 @@ public class MainActivity extends AppCompatActivity {
             TableRow tr = new TableRow(this);
             tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
 
-            final Button btnChangeName = new Button(this);
+            final Button btnChangeName = new Button(context);
             btnChangeName.setText(deviceNickName);
 
 

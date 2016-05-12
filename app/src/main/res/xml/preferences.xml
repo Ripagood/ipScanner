@@ -1,13 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <EditTextPreference android:title="Your Name"
+    <EditTextPreference
+        android:editable="false"
+        android:title="Your Username"
         android:key="username"
-        android:summary="Please provide your username"></EditTextPreference>
+        android:summary="The username used to sync to the cloud"/>
+    <CheckBoxPreference android:title="Stay logged in"
+        android:defaultValue="true"
+        android:summary="This option if selected will let you stay logged in"
+        android:key="stayLoggedIn" />
     <CheckBoxPreference android:title="Application Updates"
         android:defaultValue="false"
         android:summary="This option if selected will allow the application to check for latest versions."
         android:key="applicationUpdates" />
-    <ListPreference     android:title="Download Details"
+    <ListPreference
+        android:title="Download Details"
         android:summary="Select the kind of data that you would like to download"
         android:key="downloadType"
         android:defaultValue="1"
