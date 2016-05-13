@@ -17,7 +17,7 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme.Dark" >
         <activity
             android:name="com.sourcey.materiallogindemo.MainActivity"
             android:label="@string/app_name"
@@ -38,7 +38,8 @@
         <activity
             android:name="com.sourcey.materiallogindemo.ConnectAP"
             android:label="@string/title_activity_connect_ap"
-            android:parentActivityName="com.sourcey.materiallogindemo.MainActivity" >
+            android:parentActivityName="com.sourcey.materiallogindemo.MainActivity"
+            android:theme="@style/AppTheme.Dark" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.sourcey.materiallogindemo.MainActivity" />

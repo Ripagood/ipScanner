@@ -2556,6 +2556,7 @@ containing a value of this type.
         public static final int Widget_Design_Snackbar=0x7f090135;
         public static final int Widget_Design_TabLayout=0x7f090001;
         public static final int Widget_Design_TextInputLayout=0x7f090136;
+        public static final int popupMenuStyle=0x7f090137;
     }
     public static final class xml {
         public static final int preferences=0x7f060000;

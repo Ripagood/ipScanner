@@ -2,11 +2,11 @@
 <items version="2" >
 
     <item
-        jar="/home/elias/Android/Sdk/extras/android/m2repository/com/android/support/support-annotations/22.2.0/support-annotations-22.2.0.jar"
+        jar="/home/elias/.gradle/caches/modules-2/files-2.1/com.jakewharton/butterknife/7.0.1/d5d13ea991eab0252e3710e5df3d6a9d4b21d461/butterknife-7.0.1.jar"
         jumboMode="false"
         revision="22.0.1"
-        sha1="66b42a1f3eb7676070b7ef7f14b603483aecbee1">
-        <dex dex="/home/elias/Projects/materiallogindemo/app/build/intermediates/pre-dexed/debug/support-annotations-22.2.0-a68d7ffc212677e49c4ebb0965e5e2a36fabc2d4.jar" />
+        sha1="d5d13ea991eab0252e3710e5df3d6a9d4b21d461">
+        <dex dex="/home/elias/Projects/materiallogindemo/app/build/intermediates/pre-dexed/debug/butterknife-7.0.1-8a20c0f2cf157014e9eba3b962126e8c2216818b.jar" />
     </item>
     <item
         jar="/home/elias/Projects/ip/ipScanner/app/build/intermediates/exploded-aar/com.android.support/support-v4/22.2.0/jars/libs/internal_impl-22.2.0.jar"
@@ -14,6 +14,27 @@
         revision="22.0.1"
         sha1="57f2ab85c164ff1676ec64dee787981c046fab79">
         <dex dex="/home/elias/Projects/ip/ipScanner/app/build/intermediates/pre-dexed/debug/internal_impl-22.2.0-60e6f746f6dd23392317edf021f90b68ac3bf4e4.jar" />
+    </item>
+    <item
+        jar="/home/elias/Projects/materiallogindemo/app/build/intermediates/exploded-aar/com.android.support/support-v4/22.2.0/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="1ee588ff2c4daf7b97c1cbf922a6c7f027285c2f">
+        <dex dex="/home/elias/Projects/materiallogindemo/app/build/intermediates/pre-dexed/debug/classes-90c145746ff01a4d6483d160861738f1c7181062.jar" />
+    </item>
+    <item
+        jar="/home/elias/Projects/ip/ipScanner/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="73753982da6bde518f3a4c6b372749981d14d1a0">
+        <dex dex="/home/elias/Projects/ip/ipScanner/app/build/intermediates/pre-dexed/debug/classes-160cd281d1a7b1fb6e4f22ed23d10abac75969b5.jar" />
+    </item>
+    <item
+        jar="/home/elias/Projects/materiallogindemo/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="73753982da6bde518f3a4c6b372749981d14d1a0">
+        <dex dex="/home/elias/Projects/materiallogindemo/app/build/intermediates/pre-dexed/debug/classes-02c9ed0be3aa498e322e7309b4ce1aa4ff39ce07.jar" />
     </item>
     <item
         jar="/home/elias/Projects/ip/ipScanner/app/build/intermediates/exploded-aar/com.android.support/design/22.2.0/jars/classes.jar"
@@ -30,18 +51,11 @@
         <dex dex="/home/elias/Projects/materiallogindemo/app/build/intermediates/pre-dexed/debug/classes-fc929ffb313f86c9c8c6981ceca532e9ca2e111e.jar" />
     </item>
     <item
-        jar="/home/elias/.gradle/caches/modules-2/files-2.1/com.jakewharton/butterknife/7.0.1/d5d13ea991eab0252e3710e5df3d6a9d4b21d461/butterknife-7.0.1.jar"
+        jar="/home/elias/Projects/materiallogindemo/app/build/intermediates/exploded-aar/com.android.support/support-v4/22.2.0/jars/libs/internal_impl-22.2.0.jar"
         jumboMode="false"
         revision="22.0.1"
-        sha1="d5d13ea991eab0252e3710e5df3d6a9d4b21d461">
-        <dex dex="/home/elias/Projects/materiallogindemo/app/build/intermediates/pre-dexed/debug/butterknife-7.0.1-8a20c0f2cf157014e9eba3b962126e8c2216818b.jar" />
-    </item>
-    <item
-        jar="/home/elias/Projects/ip/ipScanner/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/jars/classes.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="73753982da6bde518f3a4c6b372749981d14d1a0">
-        <dex dex="/home/elias/Projects/ip/ipScanner/app/build/intermediates/pre-dexed/debug/classes-160cd281d1a7b1fb6e4f22ed23d10abac75969b5.jar" />
+        sha1="57f2ab85c164ff1676ec64dee787981c046fab79">
+        <dex dex="/home/elias/Projects/materiallogindemo/app/build/intermediates/pre-dexed/debug/internal_impl-22.2.0-a4b9f10cb92557987f34c1c73af8c0aa2581ead0.jar" />
     </item>
     <item
         jar="/home/elias/Projects/ip/ipScanner/app/build/intermediates/exploded-aar/com.android.support/support-v4/22.2.0/jars/classes.jar"
@@ -51,25 +65,11 @@
         <dex dex="/home/elias/Projects/ip/ipScanner/app/build/intermediates/pre-dexed/debug/classes-abe210927ba695a98408f4bfae49c1436c85b48f.jar" />
     </item>
     <item
-        jar="/home/elias/Projects/materiallogindemo/app/build/intermediates/exploded-aar/com.android.support/support-v4/22.2.0/jars/classes.jar"
+        jar="/home/elias/Android/Sdk/extras/android/m2repository/com/android/support/support-annotations/22.2.0/support-annotations-22.2.0.jar"
         jumboMode="false"
         revision="22.0.1"
-        sha1="1ee588ff2c4daf7b97c1cbf922a6c7f027285c2f">
-        <dex dex="/home/elias/Projects/materiallogindemo/app/build/intermediates/pre-dexed/debug/classes-90c145746ff01a4d6483d160861738f1c7181062.jar" />
-    </item>
-    <item
-        jar="/home/elias/Projects/materiallogindemo/app/build/intermediates/exploded-aar/com.android.support/support-v4/22.2.0/jars/libs/internal_impl-22.2.0.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="57f2ab85c164ff1676ec64dee787981c046fab79">
-        <dex dex="/home/elias/Projects/materiallogindemo/app/build/intermediates/pre-dexed/debug/internal_impl-22.2.0-a4b9f10cb92557987f34c1c73af8c0aa2581ead0.jar" />
-    </item>
-    <item
-        jar="/home/elias/Projects/materiallogindemo/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.0/jars/classes.jar"
-        jumboMode="false"
-        revision="22.0.1"
-        sha1="73753982da6bde518f3a4c6b372749981d14d1a0">
-        <dex dex="/home/elias/Projects/materiallogindemo/app/build/intermediates/pre-dexed/debug/classes-02c9ed0be3aa498e322e7309b4ce1aa4ff39ce07.jar" />
+        sha1="66b42a1f3eb7676070b7ef7f14b603483aecbee1">
+        <dex dex="/home/elias/Projects/materiallogindemo/app/build/intermediates/pre-dexed/debug/support-annotations-22.2.0-a68d7ffc212677e49c4ebb0965e5e2a36fabc2d4.jar" />
     </item>
 
 </items>

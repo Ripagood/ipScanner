@@ -1,11 +1,14 @@
 package com.sourcey.materiallogindemo;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.net.ConnectivityManager;
 import android.net.DhcpInfo;
 import android.net.NetworkInfo;
@@ -296,7 +299,9 @@ public class MainActivity extends AppCompatActivity {
             TableRow tr = new TableRow(this);
             tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
 
-            final Button btnChangeName = new Button(context);
+            //ContextThemeWrapper newContext = new ContextThemeWrapper(getBaseContext(),R.style.ButtonTheme );
+            final Button btnChangeName = new Button(this);
+            btnChangeName.getBackground().setColorFilter(getResources().getColor(R.color.primary_darker), PorterDuff.Mode.MULTIPLY);
             btnChangeName.setText(deviceNickName);
 
 
@@ -320,6 +325,7 @@ public class MainActivity extends AppCompatActivity {
 
 
             Button btnOn = new Button(this);
+            btnOn.getBackground().setColorFilter(getResources().getColor(R.color.primary_darker), PorterDuff.Mode.MULTIPLY);
             btnOn.setText("ON");
 
 
@@ -350,7 +356,8 @@ public class MainActivity extends AppCompatActivity {
             btnOn.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
             tr.addView(btnOn);
 
-            Button btnOFF = new Button(this);
+            Button btnOFF = new Button(MainActivity.this);
+            btnOFF.getBackground().setColorFilter(getResources().getColor(R.color.primary_darker), PorterDuff.Mode.MULTIPLY);
             btnOFF.setText("OFF");
 
 
@@ -381,6 +388,7 @@ public class MainActivity extends AppCompatActivity {
 
 
             final Button btnSettings = new Button(this);
+            btnSettings.getBackground().setColorFilter(getResources().getColor(R.color.primary_darker), PorterDuff.Mode.MULTIPLY);
             btnSettings.setText(":");
 
 
