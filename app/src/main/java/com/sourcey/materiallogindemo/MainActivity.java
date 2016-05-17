@@ -145,8 +145,12 @@ public class MainActivity extends AppCompatActivity {
         Log.d("numeric_id", NumericUserId);
         Log.d("LoginState", LOGIN);
 
-        loadHashMap();
-        printDevices2();
+        //loadHashMap();
+        //THIS SHOULD BE DONE AFTER GETTING THE ID FROM THE LOGIN
+        //if we skip the login then load them from here
+        //loadUsersHashMap();
+        //printDevices2();
+
 
         //startService(new Intent(this, TimeService.class));
 
@@ -523,7 +527,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                WipeDevices(); //Delete from server, then register
+                //WipeDevices(); //Delete from server, then register
                 RegisterDevices();
             }
         });
@@ -747,7 +751,8 @@ public class MainActivity extends AppCompatActivity {
 
         devices.put(NewKey, devices.get(OldKey));
         devices.remove(OldKey);
-        saveHashMap();
+       // saveHashMap();
+        saveUsersHashMap();
     }
 
     //receives the network ip address in order to find the devices
@@ -1089,6 +1094,41 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private String WipeDevicePost(String key)
+    {
+
+         //http://khansystems.com/clienteQuery/index.php?DeleteDevice=000002999
+
+        String result="";
+        try {
+            HttpRequest req = new HttpRequest(serverURL);
+            HashMap<String, String> params = new HashMap<>();
+            params.put("DeleteDevice", NumericUserId+key);
+            result=req.preparePost().withData(params).sendAndReadString();
+        }
+        catch( SocketTimeoutException e){
+            Log.d("ConnectionTimeOut", e.getLocalizedMessage());
+            //Toast.makeText(LoginActivity.this, "Connection Time out" , Toast.LENGTH_LONG).show();
+
+            runOnUiThread(new Runnable()
+            {
+                public void run()
+                {
+                    Toast.makeText(getApplicationContext(), "Connection Time out", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+        catch(MalformedURLException e){
+            Log.d("MalformedURl",e.getLocalizedMessage());
+        }
+        catch(IOException e){
+            Log.d("IO",e.getLocalizedMessage());
+        }
+        Log.d("Http Login Response:", result);
+        return result;
+    }
+
+
 
     private class HttpWipe extends AsyncTask<String, Void, String> {
 
@@ -1100,7 +1140,7 @@ public class MainActivity extends AppCompatActivity {
         protected String doInBackground(String... urls) {
 
 
-            return GET(serverURL+urls[0]+urls[1]);
+            return WipeDevicePost(urls[0]);
         }
         // onPostExecute displays the results of the AsyncTask.
         @Override
@@ -1305,7 +1345,8 @@ public class MainActivity extends AppCompatActivity {
         printDevices2();
 
         //Log.d("hs", devices.toString());
-        saveHashMap();
+       // saveHashMap();
+        saveUsersHashMap();
 
 
     }
@@ -1345,8 +1386,8 @@ public class MainActivity extends AppCompatActivity {
             HttpRequest req = new HttpRequest(serverURL);
             HashMap<String, String> params = new HashMap<>();
             params.put("AddDevice", key);
-            params.put("NickName", NickName);
             params.put("ip",ip);
+            params.put("NickName", NickName);
             params.put("User", UserId);
             result=req.preparePost().withData(params).sendAndReadString();
         }
@@ -1570,6 +1611,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void saveUsersHashMap(){
 
+        //delete last hashmap
+        users.remove(UserId);
+        //add the new hashmap
+        users.put(UserId,devices);
+
         try {
 
 
@@ -1592,7 +1638,11 @@ public class MainActivity extends AppCompatActivity {
             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
 
             users = (HashMap) objectInputStream.readObject();
-            devices = users.get(UserId);
+            if(users.containsKey(UserId))
+            {
+                devices = users.get(UserId);
+            }
+
             objectInputStream.close();
         }
         catch( IOException e){
@@ -1740,6 +1790,9 @@ public class MainActivity extends AppCompatActivity {
         Log.d("password",UserPassword);
         Log.d("numeric_id", NumericUserId);
         Log.d("LoginState", LOGIN);
+
+        loadUsersHashMap();
+        printDevices2();
     }
 
     @Override
