@@ -79,6 +79,10 @@ public class MainActivity extends AppCompatActivity {
 
     Context context;
 
+    HashMap<String, HashMap> users = new HashMap<>();
+
+
+
 
     List<String> devicesByIp = new ArrayList<>(5);
     static HashMap<String, String[]> devices = new HashMap<>();
@@ -837,7 +841,10 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    /* Used for the SCAN DEVICES METHOD*/
     private static String GET2(String url){
+
+        final int SCAN_TIME_OUT = 1000;
 
         String response="";
 
@@ -845,7 +852,7 @@ public class MainActivity extends AppCompatActivity {
             //Consider next request:
             HttpRequest req=new HttpRequest(url);
             // prepare http get request,  send to "http://host:port/path" and read server's response as String
-            response=  req.prepare().sendAndReadString();
+            response=  req.prepareTimeOut(SCAN_TIME_OUT).sendAndReadString();
         }
         catch(MalformedURLException e){
             response="malformedurl";
@@ -1025,6 +1032,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                     devices.put(intermediateNickName, addresses);
 
+                    /*
+
                     //http://192.168.0.113/SETKEY?key=999
                     String urlCommand = "/SETKEY?=key";
 
@@ -1032,6 +1041,8 @@ public class MainActivity extends AppCompatActivity {
                     //might have to be done at the end of the async tasks
                     //TODO test the new command and decide wether to relocate it or not to the end of the async tasks
                     new HttpAsyncTask().execute(ipAdd +  urlCommand + addresses[1]);
+
+                    */
                     printDevices2();
 
                 }
@@ -1190,13 +1201,14 @@ public class MainActivity extends AppCompatActivity {
     public void RegisterDevices( ){
         String NickName;
         String deviceKey;
+        String theip;
 
         for (Map.Entry<String, String[]> entry : devices.entrySet()) {
             NickName = entry.getKey();
             String value[] = entry.getValue();
-            //deviceIp = value[0];
+            theip = value[0];
             deviceKey = value[1];
-            new HttpPOSTREGISTER().execute(NickName, deviceKey);
+            new HttpPOSTREGISTER().execute(NickName, deviceKey, theip);
 
         }
 
@@ -1279,9 +1291,9 @@ public class MainActivity extends AppCompatActivity {
             params = Devices[i].split(",");
             //Log.d("d", Integer.toString(params.length));
 
-            String nickname = params[1];
+            String nickname = params[2];
             String key = params[0];
-            String ip = params[0];
+            String ip = params[1];
             String dc = "100";
             String[] values = {ip,key,dc};
             devices.put(nickname, values);
@@ -1325,7 +1337,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private String RegisterDevice(String NickName, String key){
+    private String RegisterDevice(String NickName, String key, String ip){
 
 
         String result="";
@@ -1334,6 +1346,7 @@ public class MainActivity extends AppCompatActivity {
             HashMap<String, String> params = new HashMap<>();
             params.put("AddDevice", key);
             params.put("NickName", NickName);
+            params.put("ip",ip);
             params.put("User", UserId);
             result=req.preparePost().withData(params).sendAndReadString();
         }
@@ -1490,6 +1503,7 @@ public class MainActivity extends AppCompatActivity {
             //Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_SHORT).show();
             //Toast.makeText(getBaseContext(), result, Toast.LENGTH_SHORT).show();
             Log.d("d","https POST " +key);
+            Log.d("d","https POST "+ result);
 
 
         }
@@ -1500,15 +1514,17 @@ public class MainActivity extends AppCompatActivity {
 
         private String Nickname;
         private String key;
+        private String ip;
 
 
 
         @Override
         protected String doInBackground(String... urls) {
 
+            ip = urls[2];
             Nickname = urls[0];
             key = urls[1];
-            return RegisterDevice(Nickname, key);
+            return RegisterDevice(Nickname, key,ip);
         }
         // onPostExecute displays the results of the AsyncTask.
         @Override
@@ -1551,6 +1567,43 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
+    public void saveUsersHashMap(){
+
+        try {
+
+
+            FileOutputStream fileOutputStream = openFileOutput("hsUsers.bin", Context.MODE_PRIVATE);
+            ObjectOutputStream objectOutputStream= new ObjectOutputStream(fileOutputStream);
+            objectOutputStream.writeObject(users);
+            objectOutputStream.close();
+        }
+        catch(IOException e){
+            e.printStackTrace();
+        }
+
+    }
+
+    public void loadUsersHashMap(){
+
+
+        try {
+            FileInputStream fileInputStream = openFileInput("hsUsers.bin");
+            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+
+            users = (HashMap) objectInputStream.readObject();
+            devices = users.get(UserId);
+            objectInputStream.close();
+        }
+        catch( IOException e){
+            e.printStackTrace();
+
+        }
+        catch (ClassNotFoundException e){
+            e.printStackTrace();
+        }
+    }
+
 
     public void loadHashMap(){
 

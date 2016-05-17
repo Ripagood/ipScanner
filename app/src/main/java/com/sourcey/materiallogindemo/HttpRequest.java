@@ -64,6 +64,16 @@ public class HttpRequest {
      * @param isPost boolean - indicates whether this request should be sent in POST method
      * @throws IOException - should be checked by caller
      * */
+    private void prepareAllTimeout(boolean isPost, int timeOut)throws IOException{
+        con = (HttpURLConnection) url.openConnection();
+        if(isPost)con.setRequestMethod("POST");
+        con.setDoOutput(true);
+        con.setDoInput(true);
+        con.setConnectTimeout(timeOut);
+        os = con.getOutputStream();
+    }
+
+    //Same as above but with custom timeout
     private void prepareAll(boolean isPost)throws IOException{
         con = (HttpURLConnection) url.openConnection();
         if(isPost)con.setRequestMethod("POST");
@@ -84,6 +94,13 @@ public class HttpRequest {
         prepareAll(true);
         return this;
     }
+
+    public HttpRequest prepareTimeOut(int timeOut) throws IOException{
+        prepareAllTimeout(false,timeOut);
+        return this;
+    }
+
+
     /**
      * Writes query to open stream to server
      *

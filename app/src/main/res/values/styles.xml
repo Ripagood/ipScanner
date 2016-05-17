@@ -16,6 +16,9 @@
         <!-- To change the background of options menu-->
         <item name="android:itemBackground">@color/primary_darker</item>
 
+        <!-- What the hell is this for?-->
+        <item name="android:popupBackground">@color/primary</item>
+
 
         <item name="android:windowBackground">@color/primary</item>
 

@@ -327,7 +327,7 @@
     <string name="abc_toolbar_collapse_description">Collapse</string>
     <!-- From: file:/home/elias/Projects/ip/ipScanner/app/src/main/res/values/strings.xml -->
     <eat-comment/>
-    <string name="action_settings">Delete Settings</string>
+    <string name="action_settings">Settings</string>
     <string name="app_name">KHAN CONTROL</string>
     <!-- From: file:/home/elias/Projects/ip/ipScanner/app/build/intermediates/exploded-aar/com.android.support/design/22.2.0/res/values/values.xml -->
     <eat-comment/>
@@ -362,6 +362,9 @@
 
         <!-- To change the background of options menu-->
         <item name="android:itemBackground">@color/primary_darker</item>
+
+        <!-- What the hell is this for?-->
+        <item name="android:popupBackground">@color/primary</item>
 
 
         <item name="android:windowBackground">@color/primary</item>
