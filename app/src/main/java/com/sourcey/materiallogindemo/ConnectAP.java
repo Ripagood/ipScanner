@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.PorterDuff;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
@@ -332,6 +333,7 @@ public class ConnectAP extends AppCompatActivity {
             tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
 
             final Button btnAP = new Button(this);
+            btnAP.getBackground().setColorFilter(getResources().getColor(R.color.primary_darker), PorterDuff.Mode.MULTIPLY);
             btnAP.setText(ssid);
 
 

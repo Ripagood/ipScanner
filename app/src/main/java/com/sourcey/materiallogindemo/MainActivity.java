@@ -81,7 +81,9 @@ public class MainActivity extends AppCompatActivity {
 
     HashMap<String, HashMap> users = new HashMap<>();
 
+    //Used for storing the devices which must get a Key
 
+    List<String> devicesForKey = new ArrayList<>(5);
 
 
     List<String> devicesByIp = new ArrayList<>(5);
@@ -527,7 +529,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                //WipeDevices(); //Delete from server, then register
+                WipeDevices(); //Delete from server, then register
                 RegisterDevices();
             }
         });
@@ -1037,17 +1039,25 @@ public class MainActivity extends AppCompatActivity {
                     }
                     devices.put(intermediateNickName, addresses);
 
-                    /*
+
+                    //Add the devices to a list
+                    //When the progress dialog gets cancelled or stops
+                    //We must send the keys
+                    devicesForKey.add(intermediateNickName);
+
+
+                    //http://192.168.100.17/SETKEY?key=444
 
                     //http://192.168.0.113/SETKEY?key=999
-                    String urlCommand = "/SETKEY?=key";
+                    String urlCommand = "/SETKEY?key=";
 
                     //send the setkey command
                     //might have to be done at the end of the async tasks
                     //TODO test the new command and decide wether to relocate it or not to the end of the async tasks
-                    new HttpAsyncTask().execute(ipAdd +  urlCommand + addresses[1]);
+                   // new HttpAsyncTask().execute(ipAdd +  urlCommand + convertedKey);
+                    new HttpCommand().execute(ipAdd + urlCommand + convertedKey);
 
-                    */
+
                     printDevices2();
 
                 }
@@ -1100,6 +1110,9 @@ public class MainActivity extends AppCompatActivity {
          //http://khansystems.com/clienteQuery/index.php?DeleteDevice=000002999
 
         String result="";
+
+        String url = serverURL + "/?DeleteDevice="+ NumericUserId+key;
+        Log.d("url",url);
         try {
             HttpRequest req = new HttpRequest(serverURL);
             HashMap<String, String> params = new HashMap<>();
@@ -1134,19 +1147,24 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+        private String key="";
 
 
         @Override
         protected String doInBackground(String... urls) {
 
 
-            return WipeDevicePost(urls[0]);
+            key = urls[1];
+            Log.d("keyAsyncTask",key);
+            return WipeDevicePost(key);
         }
         // onPostExecute displays the results of the AsyncTask.
         @Override
         protected void onPostExecute(String result) {
             //Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_SHORT).show();
-            //Toast.makeText(getBaseContext(), result, Toast.LENGTH_SHORT).show();
+
+
+            Toast.makeText(getBaseContext(), result, Toast.LENGTH_SHORT).show();
 
 
             Log.d("State", result);
@@ -1263,6 +1281,7 @@ public class MainActivity extends AppCompatActivity {
             String NickName = entry.getKey();
             String value[] = entry.getValue();
             String key = value[1];
+            Log.d("WipeDevices",key);
             WipeDevice(key);
 
         }
@@ -1272,6 +1291,8 @@ public class MainActivity extends AppCompatActivity {
     private void WipeDevice(String key){
 
         //http://khansystems.com/clienteQuery/index.php?DeleteDevice=000002999
+
+        Log.d("WipeDevice",key);
 
         new HttpWipe().execute(NumericUserId,key);
     }
@@ -1285,10 +1306,10 @@ public class MainActivity extends AppCompatActivity {
 
         url = serverURL + "/?GetDevices="+ NumUserId;
         Log.d("LoadDevices",url);
-        result = GET4(url);
+       // result = GET4(url);
 
 
-        /*
+
         String response = "";
 
         HashMap<String, String> params = new HashMap<>();
@@ -1313,9 +1334,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return response;
-        */
 
-        return result;
+
+       // return result;
     }
 
     //parses and sets the Devices from the http request
@@ -1380,6 +1401,10 @@ public class MainActivity extends AppCompatActivity {
 
     private String RegisterDevice(String NickName, String key, String ip){
 
+        Log.d("ip",ip);
+        Log.d("NickName",NickName);
+        Log.d("key",key);
+        Log.d("User",UserId);
 
         String result="";
         try {
@@ -1546,6 +1571,8 @@ public class MainActivity extends AppCompatActivity {
             Log.d("d","https POST " +key);
             Log.d("d","https POST "+ result);
 
+            Toast.makeText(getBaseContext(), "Changed to "+result.replace(" ",""), Toast.LENGTH_SHORT).show();
+
 
         }
     }
@@ -1562,16 +1589,17 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String... urls) {
 
-            ip = urls[2];
+
             Nickname = urls[0];
             key = urls[1];
+            ip = urls[2];
             return RegisterDevice(Nickname, key,ip);
         }
         // onPostExecute displays the results of the AsyncTask.
         @Override
         protected void onPostExecute(String result) {
             //Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_SHORT).show();
-            //Toast.makeText(getBaseContext(), result, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getBaseContext(), result, Toast.LENGTH_SHORT).show();
 
 
         }
