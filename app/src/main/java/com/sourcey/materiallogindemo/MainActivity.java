@@ -894,16 +894,33 @@ public class MainActivity extends AppCompatActivity {
             response=  req.prepare().sendAndReadString();
         }
         catch(MalformedURLException e){
-            response="malformedurl";
+
+            runOnUiThread(new Runnable()
+            {
+                public void run()
+                {
+                    Toast.makeText(getApplicationContext(), "malformedUrl", Toast.LENGTH_SHORT).show();
+                }
+            });
             Log.d("MalformedURl",e.getLocalizedMessage());
         }
         catch (SocketTimeoutException e){
-            response="timeout";
+
             Log.d("Connection timed out", e.getLocalizedMessage());
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    Toast.makeText(getApplicationContext(), "Connection Time Out", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
         catch(IOException e){
-            response = "ioexception";
+
             Log.d("IOException",e.getLocalizedMessage());
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    Toast.makeText(getApplicationContext(), "ioException", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
         return  response;
 
@@ -1055,7 +1072,7 @@ public class MainActivity extends AppCompatActivity {
                     //might have to be done at the end of the async tasks
                     //TODO test the new command and decide wether to relocate it or not to the end of the async tasks
                    // new HttpAsyncTask().execute(ipAdd +  urlCommand + convertedKey);
-                    new HttpCommand().execute(ipAdd + urlCommand + convertedKey);
+                    new HttpCommand().execute(ipAdd + urlCommand +convertedKey);
 
 
                     printDevices2();
@@ -1184,7 +1201,7 @@ public class MainActivity extends AppCompatActivity {
         protected String doInBackground(String... urls) {
 
             ipAdd = urls[0];
-            return GET4(urls[0]);
+            return GET(urls[0]);
         }
         // onPostExecute displays the results of the AsyncTask.
         @Override

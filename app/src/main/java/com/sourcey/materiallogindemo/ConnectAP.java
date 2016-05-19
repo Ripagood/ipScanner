@@ -1,5 +1,6 @@
 package com.sourcey.materiallogindemo;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -11,8 +12,10 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputFilter;
@@ -37,6 +40,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -65,6 +70,9 @@ public class ConnectAP extends AppCompatActivity {
 
     private ProgressDialog setupPD;
 
+    //The SSID of the network we are connected to when we create the activity
+    //this will be used to reconnect after sending the info to an AP
+    String mainSSID="";
 
     private ProgressDialog pd;
 
@@ -90,14 +98,15 @@ public class ConnectAP extends AppCompatActivity {
         setContentView(R.layout.activity_connect_ap);
         context = getApplicationContext();
 
+        WifiManager wifiManager = (WifiManager) getSystemService (Context.WIFI_SERVICE);
+        WifiInfo info = wifiManager.getConnectionInfo ();
+        mainSSID = info.getSSID();
+        Log.d("SSID", info.getSSID());
 
 
 
-        mainWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-        receiverWifi = new WifiReceiver();
-        registerReceiver(receiverWifi, new IntentFilter(
-                WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
-        mainWifi.startScan();
+        scanForAPs();
+
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("AP Connection");
@@ -114,6 +123,8 @@ public class ConnectAP extends AppCompatActivity {
             }
         });
 
+        builder.setCancelable(false);
+
 
         //builder.show();
         AlertDialog dialog = builder.show();
@@ -127,12 +138,36 @@ public class ConnectAP extends AppCompatActivity {
     }
 
 
+    //Register a receiver for APs
+    private void scanForAPs()
+    {
+
+        mainWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        receiverWifi = new WifiReceiver();
+        registerReceiver(receiverWifi, new IntentFilter(
+                WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+        mainWifi.startScan();
+
+    }
+
+
     private void selectedAP(String ssids){
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Select your home network and input your password");
-        //builder.setMessage("Select your home network and input your password");
-        //IMPORTANT DONT USE SET MESSAGE OR ITEMS WONT DISPLAY
+
+
+        if(ssids.equals(""))
+        {
+            //No actual input || malforemd || ioexception
+            builder.setMessage("No visible networks, Retry");
+
+        }else {
+
+
+            builder.setTitle("Select your home network and input your password");
+            //builder.setMessage("Select your home network and input your password");
+            //IMPORTANT DONT USE SET MESSAGE OR ITEMS WONT DISPLAY
+        }
         list = ssids.split(";");
         //retrieve ssids
 
@@ -325,9 +360,11 @@ public class ConnectAP extends AppCompatActivity {
         String ssid;
 
 
+
         for(int i=0; i<ssids.size();i++)
         {
             ssid=ssids.get(i);
+            Log.d("ssid",ssid);
 
             TableRow tr = new TableRow(this);
             tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
@@ -386,7 +423,7 @@ public class ConnectAP extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... urls) {
-            return GET4(urls[0]);
+            return GET(urls[0]);
         }
         // onPostExecute displays the results of the AsyncTask.
         @Override
@@ -402,6 +439,35 @@ public class ConnectAP extends AppCompatActivity {
                 WifiManager wifiManager = (WifiManager)context.getSystemService(Context.WIFI_SERVICE);
                 wifiManager.disconnect();
                 Toast.makeText(getBaseContext(), "Delivered! Scan for devices", Toast.LENGTH_LONG).show();
+
+                //Reconnect to main network
+                //i.e. the one saved when the users enters the activity
+                //see on create method
+                //WifiManager wifiManager = (WifiManager)context.getSystemService(WIFI_SERVICE);
+                int netId = -1;
+                for (WifiConfiguration tmp : wifiManager.getConfiguredNetworks())
+                    if (tmp.SSID.equals( "\""+mainSSID+"\""))
+                    {
+                        netId = tmp.networkId;
+                        wifiManager.enableNetwork(netId, true);
+                    }
+
+
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        //Do something after 2000ms
+                        ssids.clear();
+                        printAPs();
+                    }
+                }, 2000);
+
+
+
+
+
+
             }
 
 
@@ -416,7 +482,7 @@ public class ConnectAP extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... urls) {
-            return GET4(urls[0]);
+            return GET(urls[0]);
         }
         // onPostExecute displays the results of the AsyncTask.
         @Override
@@ -432,6 +498,49 @@ public class ConnectAP extends AppCompatActivity {
 
 
         }
+    }
+
+    private String GET(String url){
+
+        String response="";
+
+        try{
+            //Consider next request:
+            HttpRequest req=new HttpRequest(url);
+            // prepare http get request,  send to "http://host:port/path" and read server's response as String
+            response=  req.prepare().sendAndReadString();
+        }
+        catch(MalformedURLException e){
+
+            runOnUiThread(new Runnable()
+            {
+                public void run()
+                {
+                    Toast.makeText(getApplicationContext(), "malformedUrl", Toast.LENGTH_SHORT).show();
+                }
+            });
+            Log.d("MalformedURl",e.getLocalizedMessage());
+        }
+        catch (SocketTimeoutException e){
+
+            Log.d("Connection timed out", e.getLocalizedMessage());
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    Toast.makeText(getApplicationContext(), "Connection Time Out", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+        catch(IOException e){
+
+            Log.d("IOException",e.getLocalizedMessage());
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    Toast.makeText(getApplicationContext(), "ioException", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+        return  response;
+
     }
 
 
