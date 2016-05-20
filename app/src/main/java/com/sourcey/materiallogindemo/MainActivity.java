@@ -15,6 +15,7 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -212,28 +213,64 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    //check for wifi connection
+    private Boolean wifiConected()
+    {
+        ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+
+        return mWifi.isConnected();
+    }
 
 
     public void ScanDevices(View view){
         //pressing the button toggles the text and the function
         final Button btn = (Button) findViewById(R.id.buttonScan);
 
-        if(btn.getText().equals("Stop Scan"))
-        {
-            //we must stop the async tasks
-            for( AsyncTask asyncTask: deviceScanner){
+        ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
-                asyncTask.cancel(true);
-
-
-            }
-            btn.setText("Scan Devices");
+        if (!mWifi.isConnected()) {
+            // Do whatever
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Wifi Connection");
+            builder.setMessage("You must be connected to a wifi network in order to scan devices");
 
 
+// Set up the buttons
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
 
-        }else// we must scan the devices
-        {
-            btn.setText("Stop Scan");
+                    //nothing to do MISRA
+                }
+            });
+
+            builder.setCancelable(false);
+
+
+            //builder.show();
+            AlertDialog dialog = builder.show();
+            TextView messageText = (TextView)dialog.findViewById(android.R.id.message);
+            messageText.setGravity(Gravity.CENTER);
+            dialog.show();
+
+        }else {
+
+            if (btn.getText().equals("Stop Scan")) {
+                //we must stop the async tasks
+                for (AsyncTask asyncTask : deviceScanner) {
+
+                    asyncTask.cancel(true);
+
+
+                }
+                btn.setText("Scan Devices");
+
+
+            } else// we must scan the devices
+            {
+                btn.setText("Stop Scan");
             /*
         WifiManager wifiMan = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         WifiInfo wifiInf = wifiMan.getConnectionInfo();
@@ -242,24 +279,25 @@ public class MainActivity extends AppCompatActivity {
         toast.setText(ip);
         */
 
-            // Only works when NOT tethering
-            WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+                // Only works when NOT tethering
+                WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
 
 
-            DhcpInfo dhcp = wifi.getDhcpInfo();
+                DhcpInfo dhcp = wifi.getDhcpInfo();
 
-            Log.d("IP",intToIP(dhcp.ipAddress));
+                Log.d("IP", intToIP(dhcp.ipAddress));
 
-            //display network info
-            //Toast.makeText(getBaseContext(), intToIP(dhcp.ipAddress) , Toast.LENGTH_SHORT).show();
-            //Toast.makeText(getBaseContext(), intToIP(dhcp.netmask) , Toast.LENGTH_SHORT).show();
-            //Toast.makeText(getBaseContext(), intToIP(dhcp.ipAddress & dhcp.netmask) , Toast.LENGTH_SHORT).show();
-            //Toast.makeText(getBaseContext(), intToIP(~dhcp.netmask | (dhcp.ipAddress & dhcp.netmask)) , Toast.LENGTH_SHORT).show();
+                //display network info
+                //Toast.makeText(getBaseContext(), intToIP(dhcp.ipAddress) , Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getBaseContext(), intToIP(dhcp.netmask) , Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getBaseContext(), intToIP(dhcp.ipAddress & dhcp.netmask) , Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getBaseContext(), intToIP(~dhcp.netmask | (dhcp.ipAddress & dhcp.netmask)) , Toast.LENGTH_SHORT).show();
 
 
-            DeviceScan(dhcp.ipAddress & dhcp.netmask, ~dhcp.netmask | (dhcp.ipAddress & dhcp.netmask));
-            // call AsynTask to perform network operation on separate thread
-            // new HttpAsyncTask().execute("http://192.168.0.25/KHAN?");
+                DeviceScan(dhcp.ipAddress & dhcp.netmask, ~dhcp.netmask | (dhcp.ipAddress & dhcp.netmask));
+                // call AsynTask to perform network operation on separate thread
+                // new HttpAsyncTask().execute("http://192.168.0.25/KHAN?");
+            }
         }
 
     }
@@ -282,6 +320,25 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
+    private void SetConnectionToServer()
+    {
+        //pressing the button toggles the text and the function
+        final Button btn = (Button) findViewById(R.id.ButtonConnection);
+
+        btn.setText("Disconnect");
+        serverConnection = Boolean.TRUE;
+
+    }
+
+    private boolean isOnline() {
+        ConnectivityManager connMgr = (ConnectivityManager)
+                getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        return (networkInfo != null && networkInfo.isConnected());
+    }
+
+
 
     private void printDevices2(){
 
@@ -342,6 +399,10 @@ public class MainActivity extends AppCompatActivity {
             btnOn.setOnClickListener(new View.OnClickListener() {
                                          @Override
                                          public void onClick(View v) {
+
+
+                                             PopUpOn(btnChangeName.getText().toString());
+                                             /*
                                              String[] arr = devices.get(btnChangeName.getText().toString());
                                              deviceKey = arr[1];
                                              // put code on click operation
@@ -355,7 +416,7 @@ public class MainActivity extends AppCompatActivity {
                                              } else {
 
                                                  turnON(deviceIp);
-                                             }
+                                             }*/
 
                                          }
                                      }
@@ -375,6 +436,10 @@ public class MainActivity extends AppCompatActivity {
             btnOFF.setOnClickListener(new View.OnClickListener() {
                                           @Override
                                           public void onClick(View v) {
+
+
+                                              PopUpOFF(btnChangeName.getText().toString());
+                                              /*
                                               String[] arr = devices.get(btnChangeName.getText().toString());
                                               deviceKey = arr[1];
                                               // put code on click operation
@@ -387,6 +452,7 @@ public class MainActivity extends AppCompatActivity {
 
                                                   turnOFF(deviceIp);
                                               }
+                                              */
                                           }
                                       }
 
@@ -481,36 +547,87 @@ public class MainActivity extends AppCompatActivity {
 
     private void PopUpOn (String key){
 
-        String[] arr = devices.get(key);
-        deviceKey = arr[1];
-        deviceIp = arr[0];
-        // put code on click operation
-        Log.d("Button Pressed ON", deviceKey);
+        //In order to send an ON command, the device must be
+        //check for wifi, if not on wifi, call connect to server button
 
-        if (serverConnection == Boolean.TRUE ) {
+        if(!wifiConected())
+        {
+            SetConnectionToServer();
+            //will affect serverConnection variable
 
-            new HttpPOST_TurnON_OFF().execute(NumericUserId,deviceKey,"ON");
-
-        } else {
-
-            turnON(deviceIp);
         }
+
+        if((isOnline() && serverConnection) || wifiConected())
+        {
+
+            String[] arr = devices.get(key);
+            deviceKey = arr[1];
+            deviceIp = arr[0];
+            // put code on click operation
+            Log.d("Button Pressed ON", deviceKey);
+
+            if (serverConnection == Boolean.TRUE ) {
+
+                new HttpPOST_TurnON_OFF().execute(NumericUserId,deviceKey,"ON");
+
+            } else {
+
+                turnON(deviceIp);
+            }
+
+        }else
+        {
+
+            if(!wifiConected())
+            {
+                Toast.makeText(getApplicationContext(),"Wifi must be active!",Toast.LENGTH_SHORT).show();
+            }
+
+            if(!isOnline())
+            {
+                Toast.makeText(getApplicationContext(),"Not online!",Toast.LENGTH_SHORT).show();
+            }
+
+
+        }
+
+
     }
     private void PopUpOFF(String key){
 
+        if(!wifiConected())
+        {
+            SetConnectionToServer();
+            //will affect serverConnection variable
 
-        String[] arr = devices.get(key);
-        deviceKey = arr[1];
-        deviceIp = arr[0];
-        // put code on click operation
-        Log.d("Button Pressed OFF", deviceKey);
-        if (serverConnection == Boolean.TRUE) {
+        }
+        if((isOnline() && serverConnection) || wifiConected()) {
 
-            new HttpPOST_TurnON_OFF().execute(NumericUserId, deviceKey, "OF");
+            String[] arr = devices.get(key);
+            deviceKey = arr[1];
+            deviceIp = arr[0];
+            // put code on click operation
+            Log.d("Button Pressed OFF", deviceKey);
+            if (serverConnection == Boolean.TRUE) {
 
-        } else {
+                new HttpPOST_TurnON_OFF().execute(NumericUserId, deviceKey, "OF");
 
-            turnOFF(deviceIp);
+            } else {
+
+                turnOFF(deviceIp);
+            }
+        }else
+        {
+            if(!wifiConected())
+            {
+                Toast.makeText(getApplicationContext(),"Wifi must be active!",Toast.LENGTH_SHORT).show();
+            }
+
+            if(!isOnline())
+            {
+                Toast.makeText(getApplicationContext(),"Not online!",Toast.LENGTH_SHORT).show();
+            }
+
         }
 
 
@@ -902,11 +1019,11 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "malformedUrl", Toast.LENGTH_SHORT).show();
                 }
             });
-            Log.d("MalformedURl",e.getLocalizedMessage());
+            Log.d("MalformedURl","url");
         }
         catch (SocketTimeoutException e){
 
-            Log.d("Connection timed out", e.getLocalizedMessage());
+            Log.d("Connection timed out", "url");
             runOnUiThread(new Runnable() {
                 public void run() {
                     Toast.makeText(getApplicationContext(), "Connection Time Out", Toast.LENGTH_SHORT).show();
@@ -915,7 +1032,7 @@ public class MainActivity extends AppCompatActivity {
         }
         catch(IOException e){
 
-            Log.d("IOException",e.getLocalizedMessage());
+            Log.d("IOException","url");
             runOnUiThread(new Runnable() {
                 public void run() {
                     Toast.makeText(getApplicationContext(), "ioException", Toast.LENGTH_SHORT).show();
@@ -1857,16 +1974,38 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.SaveDevices:
                 //Toast.makeText(getApplicationContext(),"Item 1 Selected",Toast.LENGTH_SHORT).show();
-                RegisterDevicesConfirm();
+                if(isOnline()) {
+                    RegisterDevicesConfirm();
+                }else
+                {
+                    Toast.makeText(getApplicationContext(),"Not Online!",Toast.LENGTH_SHORT).show();
+                }
                 return true;
             case R.id.LoadDevices:
                 //Toast.makeText(getApplicationContext(),"Item 2 Selected",Toast.LENGTH_SHORT).show();
-                new  HttpPOST_LoadDevices().execute(NumericUserId);
+
+
+                if(isOnline())
+                {
+                    new  HttpPOST_LoadDevices().execute(NumericUserId);
+                }else
+                {
+                    Toast.makeText(getApplicationContext(),"Not Online!",Toast.LENGTH_SHORT).show();
+                }
+
+
                 return true;
             case R.id.WipeDevices:
+                if(isOnline())
+                {
+                    WipeDevicesConfirm();
+                    //DELETE DEVICES FROM SERVER
+                }else
+                {
+                    Toast.makeText(getApplicationContext(),"Not Online!",Toast.LENGTH_SHORT).show();
+                }
 
-                WipeDevicesConfirm();
-                //DELETE DEVICES FROM SERVER
+
                 return true;
 
             case R.id.action_settings:
@@ -1881,7 +2020,15 @@ public class MainActivity extends AppCompatActivity {
                 //DELETES LOCAL SETTINGS
                 //WipeSettings();
                 //deleteHashMap();
-                StartActivityConnectAP();
+                if(wifiConected())
+                {
+                    StartActivityConnectAP();
+                }else
+                {
+                    Toast.makeText(getApplicationContext(),"Wifi must be active!",Toast.LENGTH_LONG).show();
+
+                }
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

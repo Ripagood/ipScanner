@@ -138,6 +138,57 @@ public class ConnectAP extends AppCompatActivity {
     }
 
 
+    //Present alert dialog asking wether to go back to main after sending ssid and pass
+    //Also used as delay for clearing the ssids list
+    private void MainActivityAlertDialog()
+    {
+
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("AP Connection");
+        builder.setMessage("The network has been sent to the device. In order to use the device+" +
+                "go back to Main Activity and push Scan Devices");
+
+
+// Set up the buttons
+        builder.setPositiveButton("Go back", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                //
+                finish();
+            }
+        });
+
+        builder.setNegativeButton("Add other Device", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        //Do something after 2000ms
+                        ssids.clear();
+                        printAPs();
+                    }
+                }, 500);
+            }
+        });
+
+        builder.setCancelable(false);
+
+
+        //builder.show();
+        AlertDialog dialog = builder.show();
+        TextView messageText = (TextView)dialog.findViewById(android.R.id.message);
+        messageText.setGravity(Gravity.CENTER);
+        dialog.show();
+
+    }
+
+
+
     //Register a receiver for APs
     private void scanForAPs()
     {
@@ -151,6 +202,8 @@ public class ConnectAP extends AppCompatActivity {
     }
 
 
+    //Displays ssids received from device in order to ask for password and send it
+    //to the ap
     private void selectedAP(String ssids){
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -452,19 +505,7 @@ public class ConnectAP extends AppCompatActivity {
                         wifiManager.enableNetwork(netId, true);
                     }
 
-
-                final Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        //Do something after 2000ms
-                        ssids.clear();
-                        printAPs();
-                    }
-                }, 2000);
-
-
-
+                MainActivityAlertDialog();
 
 
 

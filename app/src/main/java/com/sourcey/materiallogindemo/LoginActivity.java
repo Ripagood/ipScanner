@@ -5,6 +5,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -59,14 +61,28 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                login();
+                if(isOnline())
+                {
+                    login();
+                }else
+                {
+                    Toast.makeText(getBaseContext(), "Not online!", Toast.LENGTH_LONG).show();
+                }
+
             }
         });
 
         _SkiplLoginButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
+
+                if(wifiConected())
+                {
                 SkipLogin();
+                }else
+                {
+                    Toast.makeText(getBaseContext(), "Wifi must be active!", Toast.LENGTH_LONG).show();
+                }
             }
 
         });
@@ -93,6 +109,14 @@ public class LoginActivity extends AppCompatActivity {
 
 
     }
+
+    private boolean isOnline() {
+        ConnectivityManager connMgr = (ConnectivityManager)
+                getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        return (networkInfo != null && networkInfo.isConnected());
+    }
+
 
     public void login() {
         Log.d(TAG, "Login");
@@ -253,6 +277,15 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         return valid;
+    }
+
+    //check for wifi connection
+    private Boolean wifiConected()
+    {
+        ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+
+        return mWifi.isConnected();
     }
 
 
