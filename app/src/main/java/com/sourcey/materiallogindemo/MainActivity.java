@@ -1183,16 +1183,26 @@ public class MainActivity extends AppCompatActivity {
                     //http://192.168.100.17/SETKEY?key=444
 
                     //http://192.168.0.113/SETKEY?key=999
-                    String urlCommand = "/SETKEY?key=";
+                   // String urlCommand = "/SETKEY?key=";
+
+                    //http://192.168.0.113/REMOTE?UserID=000002999
+                    String urlCommand = "/REMOTE?UserID=";
 
                     //send the setkey command
                     //might have to be done at the end of the async tasks
                     //TODO test the new command and decide wether to relocate it or not to the end of the async tasks
                    // new HttpAsyncTask().execute(ipAdd +  urlCommand + convertedKey);
-                    new HttpCommand().execute(ipAdd + urlCommand +convertedKey);
+                    new HttpCommand().execute(ipAdd + urlCommand + NumericUserId + convertedKey);
+
+                    Toast.makeText(getBaseContext(),"Device Added", Toast.LENGTH_SHORT).show();
+
+
 
 
                     printDevices2();
+
+
+
 
                 }
 
@@ -1254,7 +1264,7 @@ public class MainActivity extends AppCompatActivity {
             result=req.preparePost().withData(params).sendAndReadString();
         }
         catch( SocketTimeoutException e){
-            Log.d("ConnectionTimeOut", e.getLocalizedMessage());
+            Log.d("ConnectionTimeOut", "time out");
             //Toast.makeText(LoginActivity.this, "Connection Time out" , Toast.LENGTH_LONG).show();
 
             runOnUiThread(new Runnable()
@@ -1266,10 +1276,10 @@ public class MainActivity extends AppCompatActivity {
             });
         }
         catch(MalformedURLException e){
-            Log.d("MalformedURl",e.getLocalizedMessage());
+            Log.d("MalformedURl","malformed url");
         }
         catch(IOException e){
-            Log.d("IO",e.getLocalizedMessage());
+            Log.d("IO","io exception");
         }
         Log.d("Http Login Response:", result);
         return result;
@@ -1562,14 +1572,14 @@ public class MainActivity extends AppCompatActivity {
             });
             //
             Log.d("connection","timeout");
-            Log.d("ConnectionTimeOut",e.getLocalizedMessage());
+           // Log.d("ConnectionTimeOut",e.getLocalizedMessage());
 
         }
         catch(MalformedURLException e){
-            Log.d("MalformedURl",e.getLocalizedMessage());
+            Log.d("MalformedURl","malformedUrl");
         }
         catch(IOException e){
-            Log.d("IO",e.getLocalizedMessage());
+            Log.d("IO","ioexception");
         }
         Log.d("Http Post Response:", result);
         return result;
@@ -1702,10 +1712,19 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String result) {
             //Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_SHORT).show();
             //Toast.makeText(getBaseContext(), result, Toast.LENGTH_SHORT).show();
-            Log.d("d","https POST " +key);
-            Log.d("d","https POST "+ result);
+            Log.d("d", "https POST " + key);
 
-            Toast.makeText(getBaseContext(), "Changed to "+result.replace(" ",""), Toast.LENGTH_SHORT).show();
+
+            if(result == null)
+            {
+
+            }else
+            {
+                Log.d("d","https POST "+ result);
+                Toast.makeText(getBaseContext(), "Changed to "+result.replace(" ",""), Toast.LENGTH_SHORT).show();
+            }
+
+
 
 
         }

@@ -241,6 +241,21 @@ public class LoginActivity extends AppCompatActivity {
         moveTaskToBack(true);
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        progressDialog.dismiss();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        progressDialog.dismiss();
+    }
+
+
     public void onLoginSuccess() {
         _loginButton.setEnabled(true);
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
