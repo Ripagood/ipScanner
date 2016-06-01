@@ -1190,9 +1190,17 @@ public class MainActivity extends AppCompatActivity {
 
                     //send the setkey command
                     //might have to be done at the end of the async tasks
-                    //TODO test the new command and decide wether to relocate it or not to the end of the async tasks
+                    //TODO test the new command and decide whether to relocate it or not to the end of the async tasks
                    // new HttpAsyncTask().execute(ipAdd +  urlCommand + convertedKey);
-                    new HttpCommand().execute(ipAdd + urlCommand + NumericUserId + convertedKey);
+
+
+                    //If we are logged in, we must send the device parameters , i.e. numeric user id and key
+                    //this means we can only have 1 user for device
+                    //the app doesnt send the parameters if we are not logged in
+                    if(!LOGIN.equals("FALSE"))
+                    {
+                        new HttpCommand().execute(ipAdd + urlCommand + NumericUserId + convertedKey);
+                    }
 
                     Toast.makeText(getBaseContext(),"Device Added", Toast.LENGTH_SHORT).show();
 

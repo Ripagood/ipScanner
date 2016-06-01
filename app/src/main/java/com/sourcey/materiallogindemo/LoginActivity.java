@@ -245,14 +245,18 @@ public class LoginActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
 
-        progressDialog.dismiss();
+        if(progressDialog != null) {
+            progressDialog.dismiss();
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
 
-        progressDialog.dismiss();
+        if(progressDialog != null) {
+            progressDialog.dismiss();
+        }
     }
 
 
