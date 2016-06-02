@@ -379,7 +379,7 @@ public class LoginActivity extends AppCompatActivity {
             result=req.preparePost().withData(params).sendAndReadString();
         }
         catch( SocketTimeoutException e){
-            Log.d("ConnectionTimeOut", e.getLocalizedMessage());
+            Log.d("ConnectionTimeOut", "timeout");
             //Toast.makeText(LoginActivity.this, "Connection Time out" , Toast.LENGTH_LONG).show();
 
             runOnUiThread(new Runnable()
@@ -391,10 +391,10 @@ public class LoginActivity extends AppCompatActivity {
             });
         }
         catch(MalformedURLException e){
-            Log.d("MalformedURl",e.getLocalizedMessage());
+            Log.d("MalformedURl","malformedurl");
         }
         catch(IOException e){
-            Log.d("IO",e.getLocalizedMessage());
+            Log.d("IO","ioexception");
         }
         Log.d("Http Login Response:", result);
         return result;

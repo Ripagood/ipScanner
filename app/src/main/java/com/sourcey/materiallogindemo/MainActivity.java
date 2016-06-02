@@ -73,6 +73,9 @@ public class MainActivity extends AppCompatActivity {
     private static final String PREFS_NAME = "USER_INFORMATION";
 
     public String LOGIN="";
+    /*Used for filtering button presses*/
+    /*Allow ON or OFF command only if we have received a response already*/
+    private Boolean filterButton = Boolean.FALSE;
 
     //Time out for the HTTP request
     //do not go under 500ms
@@ -568,7 +571,12 @@ public class MainActivity extends AppCompatActivity {
 
             if (serverConnection == Boolean.TRUE ) {
 
-                new HttpPOST_TurnON_OFF().execute(NumericUserId,deviceKey,"ON");
+                if(filterButton == Boolean.FALSE)
+                {
+                    filterButton = Boolean.TRUE;
+                    new HttpPOST_TurnON_OFF().execute(NumericUserId,deviceKey,"ON");
+                }
+
 
             } else {
 
@@ -610,7 +618,12 @@ public class MainActivity extends AppCompatActivity {
             Log.d("Button Pressed OFF", deviceKey);
             if (serverConnection == Boolean.TRUE) {
 
-                new HttpPOST_TurnON_OFF().execute(NumericUserId, deviceKey, "OF");
+                if(filterButton == Boolean.FALSE)
+                {
+                    filterButton = Boolean.TRUE;
+                    new HttpPOST_TurnON_OFF().execute(NumericUserId, deviceKey, "OF");
+                }
+
 
             } else {
 
@@ -1346,8 +1359,15 @@ public class MainActivity extends AppCompatActivity {
 
             if(result.equals("Changed to OFF")|| result.equals("Changed to ON")) {
                 Log.d("State", ipAdd + " " + result);
+                Toast.makeText(getBaseContext(), result, Toast.LENGTH_SHORT).show();
+            }else
+            {
+                Log.d("State", ipAdd + " " + "No response");
+                Toast.makeText(getBaseContext(), "No response", Toast.LENGTH_SHORT).show();
             }
-            Toast.makeText(getBaseContext(), result, Toast.LENGTH_SHORT).show();
+
+            filterButton = Boolean.FALSE;
+
 
 
         }
@@ -1393,7 +1413,12 @@ public class MainActivity extends AppCompatActivity {
 
         final String turnOnCommand = "/?State=ON";
 
-        new HttpTurnOnOff().execute(ip+turnOnCommand);
+        if(filterButton == Boolean.FALSE)
+        {
+            filterButton = Boolean.TRUE;
+            new HttpTurnOnOff().execute(ip+turnOnCommand);
+        }
+
 
 
     }
@@ -1403,7 +1428,14 @@ public class MainActivity extends AppCompatActivity {
 
         final String turnOffCommand = "/?State=OFF";
 
-        new HttpTurnOnOff().execute(ip+turnOffCommand);
+        if(filterButton == Boolean.FALSE)
+        {
+            filterButton = Boolean.TRUE;
+            new HttpTurnOnOff().execute(ip+turnOffCommand);
+
+        }
+
+
 
 
     }
@@ -1731,6 +1763,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("d","https POST "+ result);
                 Toast.makeText(getBaseContext(), "Changed to "+result.replace(" ",""), Toast.LENGTH_SHORT).show();
             }
+            filterButton = Boolean.FALSE;
 
 
 
