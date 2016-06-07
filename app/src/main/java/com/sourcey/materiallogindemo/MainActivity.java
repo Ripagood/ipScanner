@@ -16,6 +16,7 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -157,13 +158,33 @@ public class MainActivity extends AppCompatActivity {
         //loadUsersHashMap();
         //printDevices2();
 
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        boolean stayLoggedIn = SP.getBoolean("stayLoggedIn", false);
 
-        //startService(new Intent(this, TimeService.class));
 
-        Intent intent = new Intent(this, LoginActivity.class);
-        // startActivity(intent);
-        startActivityForResult(intent, 0);
-        Log.d("afterLogin", "activity");
+        if(stayLoggedIn == Boolean.TRUE)
+        {
+
+            /*Skip login activity*/
+            /*Use last saved credentials*/
+
+
+            createInitialUI();
+
+        }else
+        {
+            /*We need a new authentication*/
+            //startService(new Intent(this, TimeService.class));
+
+            Intent intent = new Intent(this, LoginActivity.class);
+            // startActivity(intent);
+            startActivityForResult(intent, 0);
+            Log.d("afterLogin", "activity");
+
+        }
+
+
+
 
 
 
@@ -1634,6 +1655,10 @@ public class MainActivity extends AppCompatActivity {
 
         String response="";
 
+        Log.d("userid",userId);
+        Log.d("key",key);
+        Log.d("command",command);
+
         HashMap<String, String>params=new HashMap<>();
         params.put("Update", userId+key+command);
 
@@ -1641,7 +1666,7 @@ public class MainActivity extends AppCompatActivity {
             //Consider next request:
             HttpRequest req = new HttpRequest(serverURL);
 
-            response= req.preparePost().withData(params).sendAndReadString();
+            response= req.preparePostTimeOut(10000).withData(params).sendAndReadString();
         }
         catch(SocketTimeoutException e){
             runOnUiThread(new Runnable(){
@@ -1907,6 +1932,70 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /*Used for the initial UI*
+    Must load the userss devices
+     */
+    private void createInitialUI()
+    {
+        //change menu
+        invalidateOptionsMenu();
+        //disable connect to server button
+        //pressing the button toggles the text and the function
+        final Button btn = (Button) findViewById(R.id.ButtonConnection);
+
+
+
+
+
+        Log.d("login","result");
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, 0);
+
+        UserId = prefs.getString("USER_ID", "");
+        UserPassword = prefs.getString("PASSWORD","");
+        NumericUserId = prefs.getString("NUMERIC_ID", "");
+        LOGIN = prefs.getString("LOGIN","");
+
+        if(LOGIN.equals("TRUE"))
+        {
+            btn.setEnabled(true);
+
+        }else if (LOGIN.equals("FALSE"))
+        {
+            btn.setEnabled(false);
+        }else
+        {
+
+        }
+
+        Log.d("user_id",UserId);
+        Log.d("password",UserPassword);
+        Log.d("numeric_id", NumericUserId);
+        Log.d("LoginState", LOGIN);
+
+
+
+        /*Preferences for settings */
+
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        // The SharedPreferences editor - must use commit() to submit changes
+        SharedPreferences.Editor editor = SP.edit();
+        editor.putString("username",UserId);
+        editor.commit();
+
+
+        boolean usePreviousDevices = SP.getBoolean("usePreviousDevices",false);
+
+        /*We are skipping login and the settings dont allow to keep the last devices*/
+        if(usePreviousDevices == Boolean.FALSE && LOGIN.equals("FALSE")) {
+            UserId="";
+            editor.putString("username","");
+            editor.commit();
+        }
+
+        loadUsersHashMap();
+        printDevices2();
+    }
+
 
     private static class HttpCommand extends AsyncTask<String, Void, String> {
 
@@ -1978,43 +2067,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        //change menu
-        invalidateOptionsMenu();
-        //disable connect to server button
-        //pressing the button toggles the text and the function
-        final Button btn = (Button) findViewById(R.id.ButtonConnection);
-
-
-
-
-
-        Log.d("login","result");
-        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, 0);
-
-        UserId = prefs.getString("USER_ID", "");
-        UserPassword = prefs.getString("PASSWORD","");
-        NumericUserId = prefs.getString("NUMERIC_ID", "");
-        LOGIN = prefs.getString("LOGIN","");
-
-        if(LOGIN.equals("TRUE"))
-        {
-            btn.setEnabled(true);
-
-        }else if (LOGIN.equals("FALSE"))
-        {
-            btn.setEnabled(false);
-        }else
-        {
-
-        }
-
-        Log.d("user_id",UserId);
-        Log.d("password",UserPassword);
-        Log.d("numeric_id", NumericUserId);
-        Log.d("LoginState", LOGIN);
-
-        loadUsersHashMap();
-        printDevices2();
+        createInitialUI();
     }
 
     @Override

@@ -96,7 +96,12 @@ public class HttpRequest {
     }
 
     public HttpRequest prepareTimeOut(int timeOut) throws IOException{
-        prepareAllTimeout(false,timeOut);
+        prepareAllTimeout(false, timeOut);
+        return this;
+    }
+
+    public HttpRequest preparePostTimeOut(int timeOut) throws IOException{
+        prepareAllTimeout(true,timeOut);
         return this;
     }
 

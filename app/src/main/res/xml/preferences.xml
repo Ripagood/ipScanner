@@ -6,9 +6,13 @@
         android:key="username"
         android:summary="The username used to sync to the cloud"/>
     <CheckBoxPreference android:title="Stay logged in"
-        android:defaultValue="true"
+        android:defaultValue="false"
         android:summary="This option if selected will let you stay logged in"
         android:key="stayLoggedIn" />
+    <CheckBoxPreference android:title="Keep previous devices"
+        android:defaultValue="false"
+        android:summary="This option will allow the skip login to keep the last user's devices"
+        android:key="usePreviousDevices" />
     <CheckBoxPreference android:title="Application Updates"
         android:defaultValue="false"
         android:summary="This option if selected will allow the application to check for latest versions."
