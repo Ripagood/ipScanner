@@ -13,6 +13,10 @@
         android:defaultValue="false"
         android:summary="This option will allow the skip login to keep the last user's devices"
         android:key="usePreviousDevices" />
+    <CheckBoxPreference android:title="Fast Scan"
+        android:defaultValue="false"
+        android:summary="Use fast scan for device discovery"
+        android:key="fastScan" />
     <CheckBoxPreference android:title="Application Updates"
         android:defaultValue="false"
         android:summary="This option if selected will allow the application to check for latest versions."

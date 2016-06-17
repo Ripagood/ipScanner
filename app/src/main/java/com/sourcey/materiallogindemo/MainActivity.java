@@ -12,9 +12,12 @@ import android.graphics.PorterDuff;
 import android.net.ConnectivityManager;
 import android.net.DhcpInfo;
 import android.net.NetworkInfo;
+import android.net.nsd.NsdManager;
+import android.net.nsd.NsdServiceInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
@@ -56,9 +59,13 @@ import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 
+import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -66,6 +73,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeoutException;
+
+import static com.sourcey.materiallogindemo.UPnPDiscovery.discoverDevices;
+import static com.sourcey.materiallogindemo.UPnPDiscovery.stopDiscovery;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -77,6 +87,8 @@ public class MainActivity extends AppCompatActivity {
     /*Used for filtering button presses*/
     /*Allow ON or OFF command only if we have received a response already*/
     private Boolean filterButton = Boolean.FALSE;
+
+    Boolean fastScan = Boolean.FALSE;
 
     //Time out for the HTTP request
     //do not go under 500ms
@@ -126,6 +138,15 @@ public class MainActivity extends AppCompatActivity {
 
     //@Bind(R.id.buttonScan) Button _scanButton;
 
+    private NsdManager mNsdManager;
+    private NsdManager.DiscoveryListener mDiscoveryListener;
+    private NsdManager.ResolveListener mResolveListener;
+    private NsdServiceInfo mServiceInfo;
+    public String mRPiAddress;
+
+    // The NSD service type that the RPi exposes.
+    private static final String SERVICE_TYPE = "_http._tcp.";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -136,6 +157,10 @@ public class MainActivity extends AppCompatActivity {
 
 
 //        NumericUserId =getIntent().getExtras().getString("NUMERIC_ID");
+
+        //discoverDevices(context);
+       // discoverDevices(this);
+
 
 
 
@@ -251,6 +276,10 @@ public class MainActivity extends AppCompatActivity {
         //pressing the button toggles the text and the function
         final Button btn = (Button) findViewById(R.id.buttonScan);
 
+
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        fastScan = SP.getBoolean("fastScan",false);
+
         ConnectivityManager connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
@@ -283,26 +312,128 @@ public class MainActivity extends AppCompatActivity {
 
             if (btn.getText().equals("Stop Scan")) {
                 //we must stop the async tasks
+                btn.setText("Scan Devices");
+                if(fastScan == false)
+                {
+
                 for (AsyncTask asyncTask : deviceScanner) {
 
                     asyncTask.cancel(true);
 
 
+                  }
                 }
-                btn.setText("Scan Devices");
+
+
 
 
             } else// we must scan the devices
             {
-                btn.setText("Stop Scan");
+
+                if(fastScan == true)
+                {
+                    Runnable r = new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            // your code here
+                            WifiManager wifi = (WifiManager)context.getSystemService( context.getApplicationContext().WIFI_SERVICE );
+
+                            if(wifi != null) {
+
+                                WifiManager.MulticastLock lock = wifi.createMulticastLock("The Lock");
+                                lock.acquire();
+                                Log.d("here","here1");
+
+                                DatagramSocket socket = null;
+
+                                try {
+
+                                    InetAddress group = InetAddress.getByName("239.255.255.250");
+                                    int port = 1900;
+                                    String query =
+                                            "M-SEARCH * HTTP/1.1\r\n" +
+                                                    "HOST: 239.255.255.250:1900\r\n"+
+                                                    "MAN: \"ssdp:discover\"\r\n"+
+                                                    "MX: 1\r\n"+
+                                                    // "ST: urn:schemas-upnp-org:service:AVTransport:1\r\n"+  // Use for Sonos
+                                                    "ST: ssdp:all\r\n"+  // Use this for all UPnP Devices
+                                                    "\r\n";
+
+                                    socket = new DatagramSocket();
+                                    socket.setReuseAddress(true);
+                                    Log.d("here", "here2");
+
+                                    DatagramPacket dgram = new DatagramPacket(query.getBytes(), query.length(),
+                                            group, port);
+                                    socket.send(dgram);
+
+                                    long time = System.currentTimeMillis();
+                                    long curTime = time + 5000;
+
+                                    Log.d("here","here3");
+                                    // Let's consider all the responses we can get in 10 seconds
+                                    for(int i=0; i<50000;i++) {
+
+// Do your stuff
+
+                                        DatagramPacket p = new DatagramPacket(new byte[256],256);
+                                        socket.receive(p);
+
+
+                                        String s = new String(p.getData(), 0, p.getLength());
+                                        //Log.d("ssdp",s);
+                                        if (s.contains("SERVER: KhanSystems")) {
+
+                                            int first = s.indexOf("KhanSystems");
+                                            int last = s.indexOf("USN:");
+                                            String deviceInfo = s.substring(first, last);
+                                            Log.d("parsing", deviceInfo);
+                                            String[] parts = deviceInfo.split("/");
+                                            parseDevices(parts[2],parts[3]);
+                                            // addresses.add(p.getAddress().getHostAddress());
+
+                                        }
+
+                                        time = System.currentTimeMillis();
+                                        //Log.d("finished","t");
+                                    }
+                                    Log.d("finished","now");
+
+
+                                } catch (UnknownHostException e) {
+                                    e.printStackTrace();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                finally {
+                                    if (socket != null) {
+                                        socket.close();
+                                        Log.d("here", "herenotnull");
+                                    }
+                                }
+                                lock.release();
+                            }
+
+                        }
+                    };
+
+                    Thread t = new Thread(r);
+                    t.start();
+
+
+                    Log.d("here", "herescanbutton");
+                }else {
+
+
             /*
         WifiManager wifiMan = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         WifiInfo wifiInf = wifiMan.getConnectionInfo();
         int ipAddress = wifiInf.getIpAddress();
         String ip = String.format("%d.%d.%d.%d", (ipAddress & 0xff),(ipAddress >> 8 & 0xff),(ipAddress >> 16 & 0xff),(ipAddress >> 24 & 0xff));
         toast.setText(ip);
-        */
-
+*/              btn.setText("Stop Scan");
                 // Only works when NOT tethering
                 WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
 
@@ -321,10 +452,109 @@ public class MainActivity extends AppCompatActivity {
                 DeviceScan(dhcp.ipAddress & dhcp.netmask, ~dhcp.netmask | (dhcp.ipAddress & dhcp.netmask));
                 // call AsynTask to perform network operation on separate thread
                 // new HttpAsyncTask().execute("http://192.168.0.25/KHAN?");
+
+                }
             }
         }
 
     }
+
+    /*Used for adding devices discovered with fast scan*/
+
+
+    public void parseDevices(String name, String ip) {
+
+        //remove newline
+        ip = ip.replace("\n", "").replace("\r", "");
+        ip = "http://"+ip;
+
+        /*If the name and the ip are already in our hashmap, then dont initiate remote strategy*/
+        if (hashmapContainsIP(ip) && devices.containsKey(name)) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getBaseContext(), "Device already added", Toast.LENGTH_SHORT).show();
+//stuff that updates ui
+
+                }
+            });
+
+
+        } else {
+
+            addresses[0] = ip;//ipaddress
+
+            Random r = new Random();
+            int i1 = r.nextInt(999 - 0) + 0;
+
+            String convertedKey = intToKey(i1);
+
+            while (devices.containsValue(convertedKey) == Boolean.TRUE) {
+
+                i1 = r.nextInt(999 - 0) + 0;
+
+                convertedKey = intToKey(i1);
+            }
+            addresses[1] = convertedKey;//devicekey assigned
+            //Toast.makeText(getBaseContext(), ipDevice, Toast.LENGTH_SHORT).show();
+            addresses[2] = "100"; //Init with 100
+            Log.d("IP ACCEPTED", ip);
+            devicesByIp.add(ip);
+
+            devices.put(name, addresses);
+
+
+            //Add the devices to a list
+            //When the progress dialog gets cancelled or stops
+            //We must send the keys
+            devicesForKey.add(name);
+
+
+            //http://192.168.100.17/SETKEY?key=444
+
+            //http://192.168.0.113/SETKEY?key=999
+            // String urlCommand = "/SETKEY?key=";
+
+            //http://192.168.0.113/REMOTE?UserID=000002999
+            String urlCommand = "/REMOTE?UserID=";
+
+            //send the setkey command
+            //might have to be done at the end of the async tasks
+            //TODO test the new command and decide whether to relocate it or not to the end of the async tasks
+            // new HttpAsyncTask().execute(ipAdd +  urlCommand + convertedKey);
+
+
+            //If we are logged in, we must send the device parameters , i.e. numeric user id and key
+            //this means we can only have 1 user for device
+            //the app doesnt send the parameters if we are not logged in
+            if (!LOGIN.equals("FALSE")) {
+                new HttpCommand().execute(ip + urlCommand + NumericUserId + convertedKey);
+            }
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getBaseContext(), "Device Added", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    printDevices2();
+
+//stuff that updates ui
+
+                }
+            });
+
+
+        }
+    }
+
+
     //Intended for debugging purposes only
     public void Connection(View view){
 
@@ -569,6 +799,62 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void sendIntensity(String ip, String intensity)
+    {
+        String uri;
+        uri = ip + "/INTENSITY?pwm=" + intensity;
+        /*Copied from PopUPon, may need check*/
+        if(!wifiConected())
+        {
+            SetConnectionToServer();
+            //will affect serverConnection variable
+
+        }
+
+        if((isOnline() && serverConnection) || wifiConected())
+        {
+
+            /*
+            String[] arr = devices.get(key);
+            deviceKey = arr[1];
+            deviceIp = arr[0];
+            // put code on click operation
+            */
+            Log.d("Set intensity", intensity);
+
+            if (serverConnection == Boolean.TRUE ) {
+
+                if(filterButton == Boolean.FALSE)
+                {
+                    filterButton = Boolean.TRUE;
+                    //If we decide to send intensity by server we must add it here
+                    //new HttpPOST_TurnON_OFF().execute(NumericUserId,deviceKey,"ON");
+                }
+
+
+            } else {
+                Log.d("Intenstiy", uri);
+                new HttpIntensity().execute(uri);
+            }
+
+        }else
+        {
+
+            if(!wifiConected())
+            {
+                Toast.makeText(getApplicationContext(),"Wifi must be active!",Toast.LENGTH_SHORT).show();
+            }
+
+            if(!isOnline())
+            {
+                Toast.makeText(getApplicationContext(),"Not online!",Toast.LENGTH_SHORT).show();
+            }
+
+
+        }
+
+    }
+
     private void PopUpOn (String key){
 
         //In order to send an ON command, the device must be
@@ -667,6 +953,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
+
 
     private void RegisterDevicesConfirm(){
 
@@ -801,6 +1089,7 @@ public class MainActivity extends AppCompatActivity {
                 addresses = devices.get(deviceK);
                 addresses[2] = Integer.toString(numericDC);
                 //Log.d("length",Integer.toString(addresses.length));
+                sendIntensity(addresses[0],addresses[2]);
 
             }
         });
@@ -858,6 +1147,7 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Change Name");
 
+
 // Set up the input
         final EditText input = new EditText(this);
 // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
@@ -877,6 +1167,11 @@ public class MainActivity extends AppCompatActivity {
 
                 }else
                 {
+                    String urlCommand = "/host?name=";
+                    String[] info = devices.get(deviceNickName);
+                    //ip,key,dc
+
+                    new HttpCommand().execute(info[0] + urlCommand + m_Text);
                     ChangeNameHashMap(m_Text, deviceNickName);
                     printDevices2();
                 }
@@ -1117,25 +1412,27 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private String intToKey(int key){
+
+        String res="";
+
+        res= Integer.toString(key);
+
+        if(res.length()==1){
+            res= "00"+res;
+        }else if(res.length()==2){
+            res= "0"+res;
+        }
+
+        return res;
+
+    }
+
     private class HttpAsyncTask extends AsyncTask<String, Void, String> {
 
         private String ipAdd;
 
-        private String intToKey(int key){
 
-            String res="";
-
-            res= Integer.toString(key);
-
-            if(res.length()==1){
-                res= "00"+res;
-            }else if(res.length()==2){
-                res= "0"+res;
-            }
-
-            return res;
-
-        }
 
 
 
@@ -1254,24 +1551,26 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-        private Boolean hashmapContainsIP(String ipToCheck)
-        {
-            Boolean retVal = Boolean.FALSE;
-            for (Map.Entry<String, String[]> entry : devices.entrySet())
-            {
-                deviceNickName = entry.getKey();
-                String value[] = entry.getValue();
-                deviceIp = value[0];
-                deviceKey = value[1];
-                deviceDutyCycle = value[2];
-                if(deviceIp.equals(ipToCheck))
-                {
-                    retVal = Boolean.TRUE;
-                }
-            }
-            return retVal;
 
+
+    }
+    private Boolean hashmapContainsIP(String ipToCheck)
+    {
+        Boolean retVal = Boolean.FALSE;
+        for (Map.Entry<String, String[]> entry : devices.entrySet())
+        {
+            deviceNickName = entry.getKey();
+            String value[] = entry.getValue();
+            deviceIp = value[0];
+            deviceKey = value[1];
+            deviceDutyCycle = value[2];
+            if(deviceIp.equals(ipToCheck))
+            {
+                retVal = Boolean.TRUE;
+            }
         }
+        return retVal;
+
     }
 
     private void setKeysToDevices()
@@ -1354,6 +1653,41 @@ public class MainActivity extends AppCompatActivity {
 
 
             Log.d("State", result);
+
+
+
+        }
+    }
+
+    private class HttpIntensity extends AsyncTask<String, Void, String> {
+
+        private String ipAdd;
+
+
+
+        @Override
+        protected String doInBackground(String... urls) {
+
+            ipAdd = urls[0];
+            return GET(urls[0]);
+        }
+        // onPostExecute displays the results of the AsyncTask.
+        @Override
+        protected void onPostExecute(String result) {
+            //Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getBaseContext(), result, Toast.LENGTH_SHORT).show();
+
+            Log.d("IntensityPre", ipAdd + " " + result);
+            if(result.equals("Received Intensity")) {
+                Log.d("Intensity", ipAdd + " " + result);
+                Toast.makeText(getBaseContext(), result, Toast.LENGTH_SHORT).show();
+            }else
+            {
+                Log.d("Intensity", ipAdd + " " + "No response");
+                Toast.makeText(getBaseContext(), "No response", Toast.LENGTH_SHORT).show();
+            }
+
+            filterButton = Boolean.FALSE;
 
 
 
