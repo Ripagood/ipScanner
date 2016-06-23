@@ -1085,7 +1085,7 @@ public class MainActivity extends AppCompatActivity {
 
                         dialog.dismiss();
                     }
-                    
+
                 });
         popDialog.setNegativeButton("No",
                 new DialogInterface.OnClickListener() {
@@ -1139,7 +1139,7 @@ public class MainActivity extends AppCompatActivity {
                 addresses = devices.get(deviceK);
                 addresses[2] = Integer.toString(numericDC);
                 //Log.d("length",Integer.toString(addresses.length));
-                sendIntensity(addresses[0],addresses[2]);
+                sendIntensity(addresses[0], addresses[2]);
 
             }
         });
@@ -1214,6 +1214,10 @@ public class MainActivity extends AppCompatActivity {
                 if(devices.containsKey(m_Text))
                 {
                     Toast.makeText(getBaseContext(),"Device Name already selected. Please introduce another one." , Toast.LENGTH_SHORT).show();
+
+                }else if
+                (m_Text.equals("")){
+                    Toast.makeText(getBaseContext(),"Please input a valid name." , Toast.LENGTH_SHORT).show();
 
                 }else
                 {
