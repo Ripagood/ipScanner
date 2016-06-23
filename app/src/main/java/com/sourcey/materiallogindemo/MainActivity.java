@@ -74,6 +74,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeoutException;
 
+import butterknife.OnLongClick;
+
 import static com.sourcey.materiallogindemo.UPnPDiscovery.discoverDevices;
 import static com.sourcey.materiallogindemo.UPnPDiscovery.stopDiscovery;
 
@@ -639,6 +641,16 @@ public class MainActivity extends AppCompatActivity {
 
             );
 
+            btnChangeName.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    // TODO Auto-generated method stub
+                    Log.d("Button Long press", btnChangeName.getText().toString());
+                    deleteDeviceShowDialog(btnChangeName.getText().toString());
+                    return true;
+                }
+            });
+
             btnChangeName.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
             tr.addView(btnChangeName);
 
@@ -1055,6 +1067,44 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void deleteDeviceShowDialog(String key)
+    {
+        final AlertDialog.Builder popDialog = new AlertDialog.Builder(this);
+
+        final String deviceK = key;
+
+        //popDialog.setIcon(android.R.drawable.btn_star_big_on);
+        popDialog.setTitle("Delete Device");
+        popDialog.setMessage("You are about to delete this device. Continue?");
+        // Button OK
+        popDialog.setPositiveButton("Yes",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        DeleteDeviceFromHashMap(deviceK);
+                        printDevices2();
+
+                        dialog.dismiss();
+                    }
+                    
+                });
+        popDialog.setNegativeButton("No",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+
+
+                });
+
+
+
+
+        popDialog.create();
+        popDialog.show();
+    }
+
+    /*Show DIalog for INTENSITY*/
+
     private void ShowDialog(String key)
     {
         final AlertDialog.Builder popDialog = new AlertDialog.Builder(this);
@@ -1122,9 +1172,9 @@ public class MainActivity extends AppCompatActivity {
 
         addresses = devices.get(key);
 
-        popDialog.setMessage("IP: "+ addresses[0]+ "\n"+
-                "Intensity: "+ addresses[2]+ "\n"+
-                "Key: "+ addresses[1]);
+        popDialog.setMessage("IP: " + addresses[0] + "\n" +
+                "Intensity: " + addresses[2] + "\n" +
+                "Key: " + addresses[1]);
         // Button OK
         popDialog.setPositiveButton("OK",
                 new DialogInterface.OnClickListener() {
@@ -1167,11 +1217,13 @@ public class MainActivity extends AppCompatActivity {
 
                 }else
                 {
+                    /*change name on device*/
                     String urlCommand = "/host?name=";
                     String[] info = devices.get(deviceNickName);
                     //ip,key,dc
 
                     new HttpCommand().execute(info[0] + urlCommand + m_Text);
+                    /*change name on hashmap*/
                     ChangeNameHashMap(m_Text, deviceNickName);
                     printDevices2();
                 }
@@ -1193,6 +1245,11 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    }
+
+    private void DeleteDeviceFromHashMap(String oldName){
+        devices.remove(oldName);
+        saveUsersHashMap();
     }
 
     private void ChangeNameHashMap(String NewKey, String OldKey){
