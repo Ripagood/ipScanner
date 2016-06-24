@@ -788,6 +788,22 @@ public class MainActivity extends AppCompatActivity {
 
             );
 
+            btnSettings.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    // Secret method
+                    // will reset the device
+                    Log.d("Settings Long press", btnChangeName.getText().toString());
+
+                    String urlCommand = devices.get(btnChangeName.getText().toString())[0]+ "/cleareeprom";
+                    Log.d("urlCommand",urlCommand);
+
+                    new HttpCommand().execute(urlCommand);
+
+                    return true;
+                }
+            });
+
             //ll.addView(btnSettings);
             btnSettings.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.FILL_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
             tr.addView(btnSettings);
