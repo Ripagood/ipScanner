@@ -795,10 +795,7 @@ public class MainActivity extends AppCompatActivity {
                     // will reset the device
                     Log.d("Settings Long press", btnChangeName.getText().toString());
 
-                    String urlCommand = devices.get(btnChangeName.getText().toString())[0]+ "/cleareeprom";
-                    Log.d("urlCommand",urlCommand);
-
-                    new HttpCommand().execute(urlCommand);
+                   resetDeviceDialog(btnChangeName.getText().toString());
 
                     return true;
                 }
@@ -1082,6 +1079,88 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+    private void secondResetDeviceDialog(String key)
+    {
+        final AlertDialog.Builder popDialog = new AlertDialog.Builder(this);
+
+        final String deviceK = key;
+
+        //popDialog.setIcon(android.R.drawable.btn_star_big_on);
+        popDialog.setTitle("Reset Device");
+        popDialog.setMessage("Are you sure? Your configuration will be deleted");
+        // Button OK
+        popDialog.setPositiveButton("Yes",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        String[] info= devices.get(deviceK);
+                        String urlCommand = info[0]+ "/cleareeprom";
+                        Log.d("urlCommand",urlCommand);
+
+                        new HttpCommand().execute(urlCommand);
+
+                        DeleteDeviceFromHashMap(deviceK);
+
+                        dialog.dismiss();
+                    }
+
+                });
+        popDialog.setNegativeButton("No",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(getBaseContext(),"Yeah though so" , Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                    }
+
+
+                });
+
+
+
+
+        popDialog.create();
+        popDialog.show();
+
+    }
+
+
+
+    private void resetDeviceDialog(String key)
+    {
+        final AlertDialog.Builder popDialog = new AlertDialog.Builder(this);
+
+        final String deviceK = key;
+
+        //popDialog.setIcon(android.R.drawable.btn_star_big_on);
+        popDialog.setTitle("Reset Device");
+        popDialog.setMessage("You are about to reset this device. Continue?");
+        // Button OK
+        popDialog.setPositiveButton("Yes",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        secondResetDeviceDialog(deviceK);
+                        dialog.dismiss();
+                    }
+
+                });
+        popDialog.setNegativeButton("No",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(getBaseContext(),"Wise choice" , Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                    }
+
+
+                });
+
+
+
+
+        popDialog.create();
+        popDialog.show();
+
+    }
 
     private void deleteDeviceShowDialog(String key)
     {
@@ -1106,6 +1185,7 @@ public class MainActivity extends AppCompatActivity {
         popDialog.setNegativeButton("No",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(getBaseContext(),"Wise choice" , Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
                     }
 
