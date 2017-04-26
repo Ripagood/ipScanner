@@ -455,7 +455,7 @@ public class ConnectAP extends AppCompatActivity {
 
     private void getSSIDfromDevice( ){
 
-        final String deviceIP ="http://192.168.4.1/networks?";
+        final String deviceIP ="http://192.168.4.1/networks";
 
 
         new HttpCommandGetSSIDsVisible().execute(deviceIP);

@@ -61,13 +61,17 @@ import java.io.ObjectOutputStream;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.InterfaceAddress;
 import java.net.MalformedURLException;
+import java.net.NetworkInterface;
 import java.net.SocketTimeoutException;
 
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -444,14 +448,26 @@ public class MainActivity extends AppCompatActivity {
 
                 Log.d("IP", intToIP(dhcp.ipAddress));
 
+
+                    int netmask = logLocalIpAddresses();
+
+
+
                 //display network info
-                //Toast.makeText(getBaseContext(), intToIP(dhcp.ipAddress) , Toast.LENGTH_SHORT).show();
-                //Toast.makeText(getBaseContext(), intToIP(dhcp.netmask) , Toast.LENGTH_SHORT).show();
-                //Toast.makeText(getBaseContext(), intToIP(dhcp.ipAddress & dhcp.netmask) , Toast.LENGTH_SHORT).show();
-                //Toast.makeText(getBaseContext(), intToIP(~dhcp.netmask | (dhcp.ipAddress & dhcp.netmask)) , Toast.LENGTH_SHORT).show();
+               /*Toast.makeText(getBaseContext(), intToIP(dhcp.ipAddress) , Toast.LENGTH_SHORT).show();
+                Toast.makeText(getBaseContext(), intToIP(dhcp.netmask) , Toast.LENGTH_SHORT).show();
+                Toast.makeText(getBaseContext(), intToIP(dhcp.ipAddress & dhcp.netmask) , Toast.LENGTH_SHORT).show();
+                Toast.makeText(getBaseContext(), intToIP(~dhcp.netmask | (dhcp.ipAddress & dhcp.netmask)) , Toast.LENGTH_SHORT).show();
 
+*/
+                    Toast.makeText(getBaseContext(), intToIP(dhcp.ipAddress) , Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getBaseContext(), intToIP(netmask) , Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getBaseContext(), intToIP(dhcp.ipAddress & netmask) , Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getBaseContext(), intToIP(~netmask | (dhcp.ipAddress & netmask)) , Toast.LENGTH_SHORT).show();
 
-                DeviceScan(dhcp.ipAddress & dhcp.netmask, ~dhcp.netmask | (dhcp.ipAddress & dhcp.netmask));
+                    //TODO change the netmask calculation method, its bugged on android 4+
+
+                DeviceScan(dhcp.ipAddress & netmask, ~netmask | (dhcp.ipAddress & netmask));
                 // call AsynTask to perform network operation on separate thread
                 // new HttpAsyncTask().execute("http://192.168.0.25/KHAN?");
 
@@ -459,6 +475,43 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+    }
+
+
+    public int logLocalIpAddresses() {
+        int mask = 0;
+        Enumeration<NetworkInterface> nwis;
+        try {
+            nwis = NetworkInterface.getNetworkInterfaces();
+            while (nwis.hasMoreElements()) {
+
+                NetworkInterface ni = nwis.nextElement();
+                for (InterfaceAddress ia : ni.getInterfaceAddresses())
+                {
+
+                    byte[] arr = ia.getAddress().getAddress();
+
+                    if ( arr.length == 4 &&
+                            ni.getDisplayName().equals("wlan0"))
+                    {
+                        //only handle IPV4
+                        Log.i("ipAdd", String.format("%s: %s/%d",
+                                ni.getDisplayName(), ia.getAddress(), ia.getNetworkPrefixLength()));
+                         mask = (0xffffffff) >>> (32 - ia.getNetworkPrefixLength());
+                        Log.i("ipAdd",intToIP(mask));
+
+
+
+                    }
+
+
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return mask;
     }
 
     /*Used for adding devices discovered with fast scan*/
@@ -1379,8 +1432,8 @@ public class MainActivity extends AppCompatActivity {
         Log.d("IP CHECKED", longToIP(ipSubnet));
         ipSubnet+=0x01000000;//endianess , first address
         ipBroadcast-=0x01000000;
-        //Log.d("IP CHECKED", longToIP(ipSubnet));
-        //Log.d("IP CHECKED", longToIP(ipBroadcast));
+        Log.d("IP CHECKED", longToIP(ipSubnet));
+        Log.d("IP CHECKED", longToIP(ipBroadcast));
 
         Log.d("IP CHECKED", intToIP(ipSubnet));
         Log.d("IP CHECKED", intToIP(ipBroadcast));
