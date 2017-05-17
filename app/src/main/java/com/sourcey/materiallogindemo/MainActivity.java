@@ -19,6 +19,7 @@ import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
+import android.os.Message;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -49,6 +50,9 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -76,7 +80,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.TimeoutException;
+
+import javax.xml.transform.sax.SAXSource;
 
 import butterknife.OnLongClick;
 
@@ -126,7 +133,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     public static String UserPassword="";
-    public final static String serverURL = "http://khansystems.com/clienteQuery/index.php";
+    //public final static String serverURL = "http://khansystems.com/clienteQuery/index.php";
+    public final static String serverURL = "http://gruporyrintegradores.com/LeafLife/clienteQuery/index.php";
 
     Boolean serverConnection = Boolean.FALSE;
 
@@ -181,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d("user_id",UserId);
         Log.d("password",UserPassword);
         Log.d("numeric_id", NumericUserId);
-        Log.d("LoginState", LOGIN);
+        Log.i("LoginState", LOGIN);
 
         //loadHashMap();
         //THIS SHOULD BE DONE AFTER GETTING THE ID FROM THE LOGIN
@@ -233,13 +241,17 @@ public class MainActivity extends AppCompatActivity {
         if(remote.equals("ON"))
         {
             //give credentials
-            Log.d("device", "/REMOTE?UserID="+NumericUserId);
-            DeviceForEach("/REMOTE?UserID="+NumericUserId);
+            Log.d("device", "/REMOTE?UserID=" + NumericUserId);
+            DeviceForEach("/REMOTE?UserID=" + NumericUserId);
 
 
         }else if(remote.equals("OFF"))
         {
             //remove credentials
+            //give credentials
+            Log.d("device", "/NOREMOTE");
+            //DeviceForEach("/NOREMOTE");
+            //new HttpCommand().execute(ip + urlCommand + NumericUserId + convertedKey);
         }else
         {
 
@@ -350,7 +362,7 @@ public class MainActivity extends AppCompatActivity {
 
                                 WifiManager.MulticastLock lock = wifi.createMulticastLock("The Lock");
                                 lock.acquire();
-                                Log.d("here","here1");
+                                Log.i("ssdp","here1");
 
                                 DatagramSocket socket = null;
 
@@ -364,12 +376,12 @@ public class MainActivity extends AppCompatActivity {
                                                     "MAN: \"ssdp:discover\"\r\n"+
                                                     "MX: 1\r\n"+
                                                     // "ST: urn:schemas-upnp-org:service:AVTransport:1\r\n"+  // Use for Sonos
-                                                    "ST: ssdp:all\r\n"+  // Use this for all UPnP Devices
+                                                    "ST:LifLyfeCorp\r\n"+  // Use this for all UPnP Devices
                                                     "\r\n";
 
                                     socket = new DatagramSocket();
                                     socket.setReuseAddress(true);
-                                    Log.d("here", "here2");
+                                    Log.i("ssdp", "here2");
 
                                     DatagramPacket dgram = new DatagramPacket(query.getBytes(), query.length(),
                                             group, port);
@@ -378,7 +390,7 @@ public class MainActivity extends AppCompatActivity {
                                     long time = System.currentTimeMillis();
                                     long curTime = time + 5000;
 
-                                    Log.d("here","here3");
+                                    Log.i("ssdp","here3");
                                     // Let's consider all the responses we can get in 10 seconds
                                     for(int i=0; i<50000;i++) {
 
@@ -389,13 +401,13 @@ public class MainActivity extends AppCompatActivity {
 
 
                                         String s = new String(p.getData(), 0, p.getLength());
-                                        //Log.d("ssdp",s);
+                                        Log.i("ssdp",s);
                                         if (s.contains("SERVER: KhanSystems")) {
 
                                             int first = s.indexOf("KhanSystems");
                                             int last = s.indexOf("USN:");
                                             String deviceInfo = s.substring(first, last);
-                                            Log.d("parsing", deviceInfo);
+                                            Log.i("ssdp", deviceInfo);
                                             String[] parts = deviceInfo.split("/");
                                             parseDevices(parts[2],parts[3]);
                                             // addresses.add(p.getAddress().getHostAddress());
@@ -403,9 +415,9 @@ public class MainActivity extends AppCompatActivity {
                                         }
 
                                         time = System.currentTimeMillis();
-                                        //Log.d("finished","t");
+                                        Log.i("ssdp","time");
                                     }
-                                    Log.d("finished","now");
+                                    Log.i("ssdp","finishednow");
 
 
                                 } catch (UnknownHostException e) {
@@ -416,7 +428,7 @@ public class MainActivity extends AppCompatActivity {
                                 finally {
                                     if (socket != null) {
                                         socket.close();
-                                        Log.d("here", "herenotnull");
+                                        Log.i("ssdp", "herenotnull");
                                     }
                                 }
                                 lock.release();
@@ -522,13 +534,13 @@ public class MainActivity extends AppCompatActivity {
         //remove newline
         ip = ip.replace("\n", "").replace("\r", "");
         ip = "http://"+ip;
-
+        final String displayName = name;
         /*If the name and the ip are already in our hashmap, then dont initiate remote strategy*/
         if (hashmapContainsIP(ip) && devices.containsKey(name)) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(getBaseContext(), "Device already added", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getBaseContext(), "Device " + displayName +" already added", Toast.LENGTH_SHORT).show();
 //stuff that updates ui
 
                 }
@@ -552,7 +564,7 @@ public class MainActivity extends AppCompatActivity {
             }
             addresses[1] = convertedKey;//devicekey assigned
             //Toast.makeText(getBaseContext(), ipDevice, Toast.LENGTH_SHORT).show();
-            addresses[2] = "100"; //Init with 100
+            addresses[2] = "10"; //Init with 100
             Log.d("IP ACCEPTED", ip);
             devicesByIp.add(ip);
 
@@ -592,8 +604,8 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(getBaseContext(), "Device Added", Toast.LENGTH_SHORT).show();
                 }
             });
-
-
+            /* save the added devices */
+            saveUsersHashMap();
 
             runOnUiThread(new Runnable() {
                 @Override
@@ -827,6 +839,18 @@ public class MainActivity extends AppCompatActivity {
                                                                    ShowDialogInfo(btnChangeName.getText().toString());
                                                                    return true;
 
+                                                               case R.id.PopUpRemote:
+                                                                   //WipeDevices();
+                                                                   ///PopUpOFF(btnChangeName.getText().toString());
+                                                                   ShowDialogRemote(btnChangeName.getText().toString());
+                                                                   return true;
+
+                                                               case R.id.PopUpRemove:
+                                                                   //WipeDevices();
+                                                                   ///PopUpOFF(btnChangeName.getText().toString());
+                                                                   ShowDialogRemove(btnChangeName.getText().toString());
+                                                                   return true;
+
                                                                case R.id.action_settings:
                                                                    return true;
                                                                default:
@@ -876,6 +900,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
+    /*  Used for the dimmer function */
 
     private void sendIntensity(String ip, String intensity)
     {
@@ -930,6 +956,64 @@ public class MainActivity extends AppCompatActivity {
 
 
         }
+
+    }
+
+    private void PopUpRemote (String ip, String command,String key){
+
+        Log.i("Pressed Remote 0 ", deviceKey);
+        if(isOnline() &&  wifiConected()) {
+
+            // Not required to know IP here in a ForEachRemote operation
+           /* String[] arr = devices.get(key);
+            deviceKey = arr[1];
+            deviceIp = arr[0];*/
+            // put code on click operation
+            Log.i("Pressed Remote ", deviceKey);
+            if (!LOGIN.equals("FALSE")) {
+
+
+                    //http://192.168.0.113/REMOTE?UserID=000002999
+                    Log.i("Pressed Remote 1 ", deviceKey +" "+ command);
+
+                    if(command.equals("ON"))
+                    {
+                        //http://192.168.0.12/REMOTE?UserID=000001430
+                        Log.i("Pressed Remote 1 ",ip + "/REMOTE?UserID=" + NumericUserId + key);
+                        new HttpCommandRemote().execute(ip + "/REMOTE?UserID=" + NumericUserId + key);
+                    }else
+                    {
+                        Log.i("Pressed Remote 1 ",ip +"/NOREMOTE" );
+                        new HttpCommandRemote().execute(ip + "/NOREMOTE");
+                    }
+
+
+
+
+            } else {
+
+                Toast.makeText(getApplicationContext(),"Must be logged in!",Toast.LENGTH_SHORT).show();
+            }
+        }else
+        {
+
+            if(wifiConected() && command.equals("OFF"))
+            {
+                new HttpCommand().execute(ip + "/NOREMOTE");
+            }
+
+            if(!wifiConected())
+            {
+                Toast.makeText(getApplicationContext(),"Wifi must be active!",Toast.LENGTH_SHORT).show();
+            }
+
+            if(!isOnline())
+            {
+                Toast.makeText(getApplicationContext(),"Not online!",Toast.LENGTH_SHORT).show();
+            }
+
+        }
+
 
     }
 
@@ -1253,49 +1337,130 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /*Show DIalog for INTENSITY*/
+    /* el ESP cuenta un 1% cada 75 microsegundos */
+    /* su valor maximo de espera es 111          */
+    /* !/60/2 = 0.00833333
+    0.00833333333 / 0.000075
+     */
 
     private void ShowDialog(String key)
     {
+        final int max = 120;
+        int initalSeekBar = 0;
         final AlertDialog.Builder popDialog = new AlertDialog.Builder(this);
         final SeekBar seek = new SeekBar(this);
-        seek.setMax(100);
+        seek.setMax(max);
+        final String deviceK = key;
+
+        if(serverConnection == Boolean.FALSE) {
+            //popDialog.setIcon(android.R.drawable.btn_star_big_on);
+            popDialog.setTitle("Select Intensity");
+            popDialog.setView(seek);
+
+            addresses = devices.get(key);
+            initalSeekBar = max - Integer.parseInt(addresses[2]);
+
+            seek.setProgress(initalSeekBar);
+
+
+            seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    //Do something here with new value
+                    //txtView.setText("Value of : " + progress);
+                    //we must save the value for the seekbar on the hashmap and reload it
+                    numericDC = max - progress;
+
+
+                    // numericDC = map(progress,1,100,111,1);
+
+
+                }
+
+                public void onStartTrackingTouch(SeekBar arg0) {
+                    // TODO Auto-generated method stub
+
+                }
+
+                public void onStopTrackingTouch(SeekBar seekBar) {
+                    // TODO Auto-generated method stub
+                    addresses = devices.get(deviceK);
+                    addresses[2] = Integer.toString(numericDC);
+                    if (numericDC <= 7) {
+                        //avoid the lower bound
+                        numericDC = 5;
+                    }
+
+                    if (numericDC >= 96) {
+                        //avoid the upper bound
+                        numericDC = max;
+                        Toast.makeText(getBaseContext(),"Minimum Intensity, turned Off" , Toast.LENGTH_SHORT).show();
+                    }
+                    //Log.d("length",Integer.toString(addresses.length));
+                    //sendIntensity(addresses[0], addresses[2]);
+                    sendIntensity(addresses[0], Integer.toString(numericDC));
+
+                }
+            });
+
+
+            // Button OK
+            popDialog.setPositiveButton("OK",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+
+                    });
+
+        }else
+        {
+            popDialog.setTitle("Intensity Level Not Available Online, touch on DISCONNECT");
+            // Button OK
+            popDialog.setPositiveButton("OK",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+
+                    });
+        }
+
+
+        popDialog.create();
+        popDialog.show();
+
+    }
+
+    private int map(int x, int in_min, int in_max, int out_min, int out_max)
+    {
+        return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+    }
+
+
+    /* Remove Device from the hashmap in app */
+    private void ShowDialogRemove(String key)
+    {
+        final AlertDialog.Builder popDialog = new AlertDialog.Builder(this);
+
         final String deviceK = key;
 
         //popDialog.setIcon(android.R.drawable.btn_star_big_on);
-        popDialog.setTitle("Select Intensity");
-        popDialog.setView(seek);
-
-        addresses = devices.get(key);
-        seek.incrementProgressBy(Integer.parseInt(addresses[2]));
-
-
-        seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                //Do something here with new value
-                //txtView.setText("Value of : " + progress);
-                //we must save the value for the seekbar on the hashmap and reload it
-                numericDC = progress;
-
-            }
-
-            public void onStartTrackingTouch(SeekBar arg0) {
-                // TODO Auto-generated method stub
-
-            }
-
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                // TODO Auto-generated method stub
-                addresses = devices.get(deviceK);
-                addresses[2] = Integer.toString(numericDC);
-                //Log.d("length",Integer.toString(addresses.length));
-                sendIntensity(addresses[0], addresses[2]);
-
-            }
-        });
-
+        popDialog.setTitle("Remove Device?");
 
         // Button OK
         popDialog.setPositiveButton("OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        devices.remove(deviceK);
+                        saveUsersHashMap();
+                        printDevices2();
+                        dialog.dismiss();
+                    }
+
+                });
+
+        // Button NOK
+        popDialog.setNegativeButton("Cancel",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
@@ -1309,6 +1474,55 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /*Dialog to manage set Remote Devices */
+    private void ShowDialogRemote(String key)
+    {
+        final AlertDialog.Builder popDialog = new AlertDialog.Builder(this);
+
+        String[] arr = devices.get(key);
+        deviceKey = arr[1];
+        deviceIp = arr[0];
+
+        //popDialog.setIcon(android.R.drawable.btn_star_big_on);
+        popDialog.setTitle("Force Remote Devices?");
+
+        // Button OK
+        popDialog.setPositiveButton("Remote",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        PopUpRemote(deviceIp,"ON",deviceKey);
+                        dialog.dismiss();
+                    }
+
+                });
+
+        // Button NOK
+        popDialog.setNeutralButton("No Remote",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        PopUpRemote(deviceIp,"OFF",deviceKey);
+                        dialog.dismiss();
+                    }
+
+                });
+
+        // Button NOK
+        popDialog.setNegativeButton("Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+
+                });
+
+
+        popDialog.create();
+        popDialog.show();
+
+    }
+
+
+    /* Show device information on the APP */
     private void ShowDialogInfo(String key)
     {
         final AlertDialog.Builder popDialog = new AlertDialog.Builder(this);
@@ -1429,14 +1643,14 @@ public class MainActivity extends AppCompatActivity {
         String urlDevice = null;
         String urlCommand = "/KHAN?";
 
-        Log.d("IP CHECKED", longToIP(ipSubnet));
+        Log.i("IP CHECKED", longToIP(ipSubnet));
         ipSubnet+=0x01000000;//endianess , first address
         ipBroadcast-=0x01000000;
-        Log.d("IP CHECKED", longToIP(ipSubnet));
-        Log.d("IP CHECKED", longToIP(ipBroadcast));
+        Log.i("IP CHECKED", longToIP(ipSubnet));
+        Log.i("IP CHECKED", longToIP(ipBroadcast));
 
-        Log.d("IP CHECKED", intToIP(ipSubnet));
-        Log.d("IP CHECKED", intToIP(ipBroadcast));
+        Log.i("IP CHECKED", intToIP(ipSubnet));
+        Log.i("IP CHECKED", intToIP(ipBroadcast));
 
         int i;
 
@@ -1471,7 +1685,7 @@ public class MainActivity extends AppCompatActivity {
             i++;
 
             urlDevice = longToIP(ipSubnet);
-            Log.d("IP CHECKED", urlDevice);
+            Log.i("IP CHECKED", urlDiscovery + urlDevice + urlCommand);
             deviceScanner.add(new HttpAsyncTask().execute(urlDiscovery + urlDevice + urlCommand));
             //new HttpAsyncTask().execute(urlDiscovery + urlDevice + urlCommand);
             // MakeRequestGet(urlDiscovery+urlDevice+urlCommand);
@@ -1587,8 +1801,15 @@ public class MainActivity extends AppCompatActivity {
         String result = "";
         try {
 
+            // set the connection timeout value to 2 seconds (2000 milliseconds)
+            final HttpParams httpParams = new BasicHttpParams();
+            HttpConnectionParams.setConnectionTimeout(httpParams, 2000);
+            HttpConnectionParams.setSoTimeout(httpParams, 2000);
+            HttpClient httpclient = new DefaultHttpClient(httpParams);
+
+
             // create HttpClient
-            HttpClient httpclient = new DefaultHttpClient();
+           // HttpClient httpclient = new DefaultHttpClient();
 
             // make GET request to the given URL
             HttpResponse httpResponse = httpclient.execute(new HttpGet(url));
@@ -1602,9 +1823,13 @@ public class MainActivity extends AppCompatActivity {
             else
                 result = "Did not work!";
 
+
+
         } catch (Exception e) {
             Log.d("InputStream", e.getLocalizedMessage());
         }
+
+
 
 
         return result;
@@ -1656,7 +1881,8 @@ public class MainActivity extends AppCompatActivity {
         protected String doInBackground(String... urls) {
 
             ipAdd = urls[0];
-            return GET2(urls[0]);
+            /* this one works OK currently */
+            return GET4(urls[0]);
         }
 
 
@@ -1879,7 +2105,7 @@ public class MainActivity extends AppCompatActivity {
         protected String doInBackground(String... urls) {
 
             ipAdd = urls[0];
-            return GET(urls[0]);
+            return GET4(urls[0]);
         }
         // onPostExecute displays the results of the AsyncTask.
         @Override
@@ -1894,7 +2120,7 @@ public class MainActivity extends AppCompatActivity {
             }else
             {
                 Log.d("Intensity", ipAdd + " " + "No response");
-                Toast.makeText(getBaseContext(), "No response", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getBaseContext(), "No response"+ result, Toast.LENGTH_SHORT).show();
             }
 
             filterButton = Boolean.FALSE;
@@ -1914,7 +2140,7 @@ public class MainActivity extends AppCompatActivity {
         protected String doInBackground(String... urls) {
 
             ipAdd = urls[0];
-            return GET(urls[0]);
+            return GET4(urls[0]);
         }
         // onPostExecute displays the results of the AsyncTask.
         @Override
@@ -1987,6 +2213,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
 
 
     public void turnOFF( String ip){
@@ -2547,7 +2774,7 @@ public class MainActivity extends AppCompatActivity {
         protected String doInBackground(String... urls) {
 
 
-            return GET2(urls[0]);
+            return GET4(urls[0]);
         }
         // onPostExecute displays the results of the AsyncTask.
         @Override
@@ -2556,13 +2783,32 @@ public class MainActivity extends AppCompatActivity {
             //Toast.makeText(getBaseContext(), result, Toast.LENGTH_SHORT).show();
 
 
-            Log.d("State", result);
+            Log.i("State", result);
+
 
 
 
         }
     }
 
+    private  class HttpCommandRemote extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... urls) {
+
+
+            return GET4(urls[0]);
+        }
+        // onPostExecute displays the results of the AsyncTask.
+        @Override
+        protected void onPostExecute(String result) {
+            //Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getBaseContext(), result, Toast.LENGTH_SHORT).show();
+            Log.i("State", result);
+
+
+        }
+    }
 
 
     @Override

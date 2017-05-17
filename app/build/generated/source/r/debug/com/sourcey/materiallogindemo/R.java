@@ -2008,8 +2008,9 @@ containing a value of this type.
         public static final int abc_textfield_search_material=0x7f02003a;
         public static final int fab_background=0x7f02003b;
         public static final int logo=0x7f02003c;
-        public static final int notification_template_icon_bg=0x7f02003e;
-        public static final int snackbar_background=0x7f02003d;
+        public static final int logo2=0x7f02003d;
+        public static final int notification_template_icon_bg=0x7f02003f;
+        public static final int snackbar_background=0x7f02003e;
     }
     public static final class id {
         public static final int ButtonConnection=0x7f0e006d;
@@ -2019,6 +2020,8 @@ containing a value of this type.
         public static final int PopUpInfo=0x7f0e0089;
         public static final int PopUpOff=0x7f0e0088;
         public static final int PopUpOn=0x7f0e0087;
+        public static final int PopUpRemote=0x7f0e008a;
+        public static final int PopUpRemove=0x7f0e008b;
         public static final int SaveDevices=0x7f0e0083;
         public static final int TableLayout01=0x7f0e006e;
         public static final int TableLayoutAP=0x7f0e0066;

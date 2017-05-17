@@ -110,8 +110,8 @@ public class ConnectAP extends AppCompatActivity {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("AP Connection");
-        builder.setMessage("Boot your device in AP mode and select it from the list here, if the " +
-                "device is not visible it will not be shown. Then input your network's credentials");
+        builder.setMessage("Deactivate your 4G, 3G data connection, boot your device in AP mode and select it from the list here, if the " +
+                "device is not visible it will not be shown.  Then input your network's credentials");
 
 
 // Set up the buttons
@@ -465,7 +465,7 @@ public class ConnectAP extends AppCompatActivity {
 
     private void sendPasswordToDevice(String ssid,String password){
         final String deviceIP ="http://192.168.4.1/setting?";
-        // 192.168.4.1/setting?ssid=xxxxx&pas=yyyyy
+        // 192.168.4.1/setting?ssid=xxxxx&pass=yyyyy
 
 
         new HttpCommandSendPassword().execute(deviceIP + "ssid=" + ssid + "&" + "pass=" +password);
@@ -522,8 +522,14 @@ public class ConnectAP extends AppCompatActivity {
     private class HttpCommandGetSSIDsVisible extends AsyncTask<String, Void, String> {
 
         @Override
+        /*TODO check GET4 or GET */
+        /* GET is the original command, for some reason, it works my house */
+        /* GET 4 should be the better one , however it doesnt work in my house +/
+        /* I dont remeber why I changed it */
+
+
         protected String doInBackground(String... urls) {
-            return GET(urls[0]);
+            return GET4(urls[0]);
         }
         // onPostExecute displays the results of the AsyncTask.
         @Override

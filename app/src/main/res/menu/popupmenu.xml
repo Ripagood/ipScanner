@@ -18,4 +18,11 @@
     <item
         android:id="@+id/PopUpInfo"
         android:title="Info"/>
+    <item
+        android:id="@+id/PopUpRemote"
+        android:title="Remote"/>
+
+    <item
+        android:id="@+id/PopUpRemove"
+        android:title="Remove"/>
 </menu>

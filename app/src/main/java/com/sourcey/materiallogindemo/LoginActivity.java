@@ -32,9 +32,9 @@ import butterknife.Bind;
 
 public class LoginActivity extends AppCompatActivity {
 
-    final String serverURL = "http://khansystems.com/clienteQuery/index.php";
+    //final String serverURL = "http://khansystems.com/clienteQuery/index.php";
 
-
+    public final static String serverURL = "http://gruporyrintegradores.com/LeafLife/clienteQuery/index.php?";
     private static final String TAG = "LoginActivity";
     private static final int REQUEST_SIGNUP = 0;
     private static final String PREFS_NAME = "USER_INFORMATION";
@@ -334,7 +334,7 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
             //Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_LONG).show();
-            //Toast.makeText(getBaseContext(), result, Toast.LENGTH_LONG).show();
+            Toast.makeText(getBaseContext(), result, Toast.LENGTH_LONG).show();
 
             String extracted;
 
