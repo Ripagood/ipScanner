@@ -408,6 +408,11 @@ public class MainActivity extends AppCompatActivity {
                                             int last = s.indexOf("USN:");
                                             String deviceInfo = s.substring(first, last);
                                             Log.i("ssdp", deviceInfo);
+                                            int firstUUID = s.indexOf("uuid:");
+                                            int lastUUID = s.indexOf("ST:");
+                                            String deviceInfoUUID = s.substring(firstUUID, lastUUID);
+                                            deviceInfoUUID= deviceInfoUUID.substring(5);
+                                            Log.i("ssdp", deviceInfoUUID);
                                             String[] parts = deviceInfo.split("/");
                                             parseDevices(parts[2],parts[3]);
                                             // addresses.add(p.getAddress().getHostAddress());
@@ -532,11 +537,14 @@ public class MainActivity extends AppCompatActivity {
     public void parseDevices(String name, String ip) {
 
         //remove newline
+        String[] values;
+        values = devices.get(name);
         ip = ip.replace("\n", "").replace("\r", "");
         ip = "http://"+ip;
         final String displayName = name;
         /*If the name and the ip are already in our hashmap, then dont initiate remote strategy*/
-        if (hashmapContainsIP(ip) && devices.containsKey(name)) {
+       // if (hashmapContainsIP(ip) && devices.containsKey(name)) {
+        if (values[0].equals(ip) && devices.containsKey(name)) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -547,7 +555,32 @@ public class MainActivity extends AppCompatActivity {
             });
 
 
-        } else {
+        } else if(devices.containsKey(name) && !(values[0].equals(ip)))
+        {
+
+            /* here we need to check for another hashmap in order to know
+            if this device was added without
+             */
+            /* the device was already in the hashmap, only update the ip */
+
+            values[0]=ip;
+
+            devices.put(name, values);
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getBaseContext(), "Device " + displayName + " already added, updating IP", Toast.LENGTH_SHORT).show();
+//stuff that updates ui
+
+                }
+            });
+            /* save the added devices */
+            saveUsersHashMap();
+
+        }
+        else /* new device , add everything */
+        {
 
             addresses[0] = ip;//ipaddress
 
@@ -1130,7 +1163,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                WipeDevices(); //Delete from server, then register
+                //WipeDevices(); //Delete from server, then register
+                // we need a new command from server side which deletes every device in
+                //the users table
                 RegisterDevices();
             }
         });
@@ -1483,39 +1518,54 @@ public class MainActivity extends AppCompatActivity {
         deviceKey = arr[1];
         deviceIp = arr[0];
 
-        //popDialog.setIcon(android.R.drawable.btn_star_big_on);
-        popDialog.setTitle("Force Remote Devices?");
+        if(serverConnection.equals(Boolean.FALSE)) {
+            //popDialog.setIcon(android.R.drawable.btn_star_big_on);
+            popDialog.setTitle("Force Remote Devices?");
 
-        // Button OK
-        popDialog.setPositiveButton("Remote",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        PopUpRemote(deviceIp,"ON",deviceKey);
-                        dialog.dismiss();
-                    }
+            // Button OK
+            popDialog.setPositiveButton("Remote",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            PopUpRemote(deviceIp, "ON", deviceKey);
+                            dialog.dismiss();
+                        }
 
-                });
+                    });
 
-        // Button NOK
-        popDialog.setNeutralButton("No Remote",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        PopUpRemote(deviceIp,"OFF",deviceKey);
-                        dialog.dismiss();
-                    }
+            // Button NOK
+            popDialog.setNeutralButton("No Remote",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            PopUpRemote(deviceIp, "OFF", deviceKey);
+                            dialog.dismiss();
+                        }
 
-                });
+                    });
 
-        // Button NOK
-        popDialog.setNegativeButton("Cancel",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
+            // Button NOK
+            popDialog.setNegativeButton("Cancel",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
 
-                });
+                    });
+
+        }else
+        {
+            popDialog.setTitle("Force Remote Devices only available Offline, touch DISCONNECT");
+            // Button OK
+            popDialog.setPositiveButton("OK",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            dialog.dismiss();
+                        }
+
+                    });
 
 
+        }
         popDialog.create();
         popDialog.show();
 
@@ -1747,7 +1797,7 @@ public class MainActivity extends AppCompatActivity {
 
 
             response = "ioexception";
-            Log.d("IOException",e.getLocalizedMessage());
+            Log.d("IOException", e.getLocalizedMessage());
         }
         return  response;
 
@@ -1798,7 +1848,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static String GET4(String url){
         InputStream inputStream = null;
-        String result = "";
+        String result = "ERROR";
         try {
 
             // set the connection timeout value to 2 seconds (2000 milliseconds)
@@ -1818,15 +1868,18 @@ public class MainActivity extends AppCompatActivity {
             inputStream = httpResponse.getEntity().getContent();
 
             // convert inputstream to string
-            if(inputStream != null)
+            if(inputStream != null) {
                 result = convertInputStreamToString(inputStream);
-            else
+            }
+            else {
                 result = "Did not work!";
+            }
 
 
 
         } catch (Exception e) {
             Log.d("InputStream", e.getLocalizedMessage());
+            return result;
         }
 
 
@@ -2113,15 +2166,20 @@ public class MainActivity extends AppCompatActivity {
             //Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_SHORT).show();
             //Toast.makeText(getBaseContext(), result, Toast.LENGTH_SHORT).show();
 
-            Log.d("IntensityPre", ipAdd + " " + result);
-            if(result.equals("Received Intensity")) {
-                Log.d("Intensity", ipAdd + " " + result);
-                Toast.makeText(getBaseContext(), result, Toast.LENGTH_SHORT).show();
+            if( result != null) {
+                Log.d("IntensityPre", ipAdd + " " + result);
+                if (result.equals("Received Intensity")) {
+                    Log.d("Intensity", ipAdd + " " + result);
+                    Toast.makeText(getBaseContext(), result, Toast.LENGTH_SHORT).show();
+                } else {
+                    Log.d("Intensity", ipAdd + " " + "No response");
+                    Toast.makeText(getBaseContext(), "No response" + result, Toast.LENGTH_SHORT).show();
+                }
             }else
             {
-                Log.d("Intensity", ipAdd + " " + "No response");
-                Toast.makeText(getBaseContext(), "No response"+ result, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getBaseContext(), "Null response", Toast.LENGTH_SHORT).show();
             }
+
 
             filterButton = Boolean.FALSE;
 
