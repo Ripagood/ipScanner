@@ -665,6 +665,7 @@ public class ConnectAP extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /* Here we scan and filter for the AP */
     class WifiReceiver extends BroadcastReceiver {
         public void onReceive(Context c, Intent intent) {
             /*
@@ -683,7 +684,7 @@ public class ConnectAP extends AppCompatActivity {
                 ssids.clear();
                 for(ScanResult s : wifiList) {
                     //"CONNECTION_NAME" is the name of SSID you would like filter
-                    if (s.SSID != null && s.SSID.toLowerCase().contains("khan")) {
+                    if (s.SSID != null && s.SSID.toLowerCase().contains("lyf")) {
                         ssids.add(s.SSID.toString());
                         Log.d("ssids", s.SSID.toString());
                     }

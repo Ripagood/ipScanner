@@ -34,7 +34,10 @@ public class LoginActivity extends AppCompatActivity {
 
     //final String serverURL = "http://khansystems.com/clienteQuery/index.php";
 
-    public final static String serverURL = "http://gruporyrintegradores.com/LeafLife/clienteQuery/index.php?";
+    //public final static String serverURL = "http://gruporyrintegradores.com/LeafLife/clienteQuery/index.php?";
+
+    public final static String serverURL = "http://104.236.155.86/AWG12coilELLsey/web_server/php_methods.php";
+
     private static final String TAG = "LoginActivity";
     private static final int REQUEST_SIGNUP = 0;
     private static final String PREFS_NAME = "USER_INFORMATION";

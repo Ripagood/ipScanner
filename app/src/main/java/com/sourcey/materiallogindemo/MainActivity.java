@@ -109,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
 
     Context context;
 
+    // stores the hashmaps for devices
     HashMap<String, HashMap> users = new HashMap<>();
 
     //Used for storing the devices which must get a Key
@@ -117,25 +118,28 @@ public class MainActivity extends AppCompatActivity {
 
 
     List<String> devicesByIp = new ArrayList<>(5);
+    //stores the devices
     static HashMap<String, String[]> devices = new HashMap<>();
 
     // name: NIckName , value = ip, key
-
+    // new implementation UUID -> ip,key,dc,deviceName
     Integer numericDC;
     static  String deviceDutyCycle;
     static String deviceIp;
     static String deviceKey;
-    static String deviceNickName;
-    static String[] addresses= {"","",""};
-    //ip,key,dc
+    static String deviceNickName; //actually the UUID and the key for the hashmap
+    static String deviceDisplayName;
+    static String[] addresses= {"","","",""};
+    //ip,key,dc,deviceName
     public static String UserId="";
     public static String NumericUserId="";// = "000002";
 
 
     public static String UserPassword="";
     //public final static String serverURL = "http://khansystems.com/clienteQuery/index.php";
-    public final static String serverURL = "http://gruporyrintegradores.com/LeafLife/clienteQuery/index.php";
+    //public final static String serverURL = "http://gruporyrintegradores.com/LeafLife/clienteQuery/index.php";
 
+    public final static String serverURL = "http://104.236.155.86/AWG12coilELLsey/web_server/php_methods.php";
     Boolean serverConnection = Boolean.FALSE;
 
 
@@ -232,11 +236,15 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /* shouldnt be used for now */
+    /* the for each SetRemoteDevices function should */
+    /* send the key associated to each device */
+
     public static void SetRemoteDevices( String remote)
     {
         //TODO set remote state to every device on the network
         Log.d("remote", remote);
-        //http://192.168.0.113/REMOTE?UserID=000002
+        //http://192.168.0.113/REMOTE?UserID=000002:key
         //http://192.168.0.113/NOREMOTE
         if(remote.equals("ON"))
         {
@@ -271,6 +279,7 @@ public class MainActivity extends AppCompatActivity {
             deviceIp = value[0];
             deviceKey = value[1];
             deviceDutyCycle = value[2];
+            deviceDisplayName = value[3];
 
             Log.d("device", command);
             new HttpCommand().execute(deviceIp + command);
@@ -414,7 +423,7 @@ public class MainActivity extends AppCompatActivity {
                                             deviceInfoUUID= deviceInfoUUID.substring(5);
                                             Log.i("ssdp", deviceInfoUUID);
                                             String[] parts = deviceInfo.split("/");
-                                            parseDevices(parts[2],parts[3]);
+                                            parseDevices(parts[2],parts[3],deviceInfoUUID);
                                             // addresses.add(p.getAddress().getHostAddress());
 
                                         }
@@ -534,17 +543,24 @@ public class MainActivity extends AppCompatActivity {
     /*Used for adding devices discovered with fast scan*/
 
 
-    public void parseDevices(String name, String ip) {
+    //public void parseDevices(String name, String ip) {
+    public void parseDevices(String name, String ip, String UUID) {
 
         //remove newline
         String[] values;
-        values = devices.get(name);
+        values = devices.get(UUID);
         ip = ip.replace("\n", "").replace("\r", "");
         ip = "http://"+ip;
         final String displayName = name;
+        String receivedIP="";
+        if(values != null)
+        {
+            receivedIP = values[0];
+        }
+
         /*If the name and the ip are already in our hashmap, then dont initiate remote strategy*/
        // if (hashmapContainsIP(ip) && devices.containsKey(name)) {
-        if (values[0].equals(ip) && devices.containsKey(name)) {
+        if (receivedIP.equals(ip) && devices.containsKey(UUID)) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -555,7 +571,7 @@ public class MainActivity extends AppCompatActivity {
             });
 
 
-        } else if(devices.containsKey(name) && !(values[0].equals(ip)))
+        } else if(devices.containsKey(UUID) && !(receivedIP.equals(ip)))
         {
 
             /* here we need to check for another hashmap in order to know
@@ -564,8 +580,9 @@ public class MainActivity extends AppCompatActivity {
             /* the device was already in the hashmap, only update the ip */
 
             values[0]=ip;
+            values[3]=name;
 
-            devices.put(name, values);
+            devices.put(UUID, values);
 
             runOnUiThread(new Runnable() {
                 @Override
@@ -601,13 +618,15 @@ public class MainActivity extends AppCompatActivity {
             Log.d("IP ACCEPTED", ip);
             devicesByIp.add(ip);
 
-            devices.put(name, addresses);
+            addresses[3]=name;
+
+            devices.put(UUID, addresses);
 
 
             //Add the devices to a list
             //When the progress dialog gets cancelled or stops
             //We must send the keys
-            devicesForKey.add(name);
+            devicesForKey.add(UUID);
 
 
             //http://192.168.100.17/SETKEY?key=444
@@ -628,7 +647,7 @@ public class MainActivity extends AppCompatActivity {
             //this means we can only have 1 user for device
             //the app doesnt send the parameters if we are not logged in
             if (!LOGIN.equals("FALSE")) {
-                new HttpCommand().execute(ip + urlCommand + NumericUserId + convertedKey);
+                new HttpCommand().execute(ip + urlCommand + NumericUserId +":"+ convertedKey);
             }
 
             runOnUiThread(new Runnable() {
@@ -693,6 +712,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    public class DeviceTag {
+        String UUID;
+        String name;
+    }
+
+
 
     private void printDevices2(){
 
@@ -710,6 +735,7 @@ public class MainActivity extends AppCompatActivity {
             deviceIp = value[0];
             deviceKey = value[1];
             deviceDutyCycle = value[2];
+            deviceDisplayName = value[3];
             // deviceKey = "666";
             //Create the LL to add a text view and a button
             /*
@@ -723,7 +749,15 @@ public class MainActivity extends AppCompatActivity {
             //ContextThemeWrapper newContext = new ContextThemeWrapper(getBaseContext(),R.style.ButtonTheme );
             final Button btnChangeName = new Button(this);
             btnChangeName.getBackground().setColorFilter(getResources().getColor(R.color.primary_darker), PorterDuff.Mode.MULTIPLY);
-            btnChangeName.setText(deviceNickName);
+           // btnChangeName.setText(deviceNickName);
+            btnChangeName.setText(deviceDisplayName);
+
+            DeviceTag dt = new DeviceTag();
+            dt.name = deviceDisplayName;
+            dt.UUID = deviceNickName;
+
+            btnChangeName.setTag(dt);
+            //TODO add tag here
 
 
 
@@ -732,7 +766,10 @@ public class MainActivity extends AppCompatActivity {
                                                  public void onClick(View v) {
                                                      // put code on click operation
                                                      Log.d("Button PressedName", btnChangeName.getText().toString());
-                                                     ChangeNameAlert(btnChangeName.getText().toString());
+                                                    // ChangeNameAlert(btnChangeName.getText().toString());
+                                                     DeviceTag dt1 = new DeviceTag();
+                                                     dt1 = (DeviceTag)btnChangeName.getTag();
+                                                     ChangeNameAlert(dt1);
 
                                                  }
                                              }
@@ -744,7 +781,7 @@ public class MainActivity extends AppCompatActivity {
                 public boolean onLongClick(View v) {
                     // TODO Auto-generated method stub
                     Log.d("Button Long press", btnChangeName.getText().toString());
-                    deleteDeviceShowDialog(btnChangeName.getText().toString());
+                    //deleteDeviceShowDialog(btnChangeName.getText().toString());
                     return true;
                 }
             });
@@ -765,7 +802,8 @@ public class MainActivity extends AppCompatActivity {
                                          public void onClick(View v) {
 
 
-                                             PopUpOn(btnChangeName.getText().toString());
+                                            // PopUpOn(btnChangeName.getText().toString());
+                                             PopUpOn((DeviceTag)btnChangeName.getTag());
                                              /*
                                              String[] arr = devices.get(btnChangeName.getText().toString());
                                              deviceKey = arr[1];
@@ -802,7 +840,8 @@ public class MainActivity extends AppCompatActivity {
                                           public void onClick(View v) {
 
 
-                                              PopUpOFF(btnChangeName.getText().toString());
+                                              //PopUpOFF(btnChangeName.getText().toString());
+                                              PopUpOFF((DeviceTag)btnChangeName.getTag());
                                               /*
                                               String[] arr = devices.get(btnChangeName.getText().toString());
                                               deviceKey = arr[1];
@@ -836,7 +875,8 @@ public class MainActivity extends AppCompatActivity {
             btnSettings.setOnClickListener(new View.OnClickListener() {
                                                @Override
                                                public void onClick(View v) {
-                                                   String[] arr = devices.get(btnChangeName.getText().toString());
+                                                   //String[] arr = devices.get(btnChangeName.getText().toString());
+                                                   String[] arr = devices.get(((DeviceTag)btnChangeName.getTag()).UUID);
                                                    deviceKey = arr[1];
                                                    // put code on click operation
                                                    Log.d("Button Pressed OFF", deviceKey);
@@ -855,33 +895,39 @@ public class MainActivity extends AppCompatActivity {
                                                                case R.id.PopUpDimmer:
                                                                    //Toast.makeText(getApplicationContext(),"Item 1 Selected",Toast.LENGTH_SHORT).show();
                                                                    //RegisterDevices();
-                                                                   ShowDialog(btnChangeName.getText().toString());
+                                                                  // ShowDialog(btnChangeName.getText().toString());
+                                                                   ShowDialog((DeviceTag)btnChangeName.getTag());
                                                                    return true;
                                                                case R.id.PopUpOn:
                                                                    //Toast.makeText(getApplicationContext(),"Item 2 Selected",Toast.LENGTH_SHORT).show();
                                                                    //new  HttpPOST_LoadDevices().execute(NumericUserId);
-                                                                   PopUpOn(btnChangeName.getText().toString());
+                                                                   //PopUpOn(btnChangeName.getText().toString());
+                                                                   PopUpOn((DeviceTag)btnChangeName.getTag());
                                                                    return true;
                                                                case R.id.PopUpOff:
                                                                    //WipeDevices();
-                                                                   PopUpOFF(btnChangeName.getText().toString());
+                                                                   //PopUpOFF(btnChangeName.getText().toString());
+                                                                   PopUpOFF((DeviceTag)btnChangeName.getTag());
                                                                    return true;
                                                                case R.id.PopUpInfo:
                                                                    //WipeDevices();
                                                                    ///PopUpOFF(btnChangeName.getText().toString());
-                                                                   ShowDialogInfo(btnChangeName.getText().toString());
+                                                                   //ShowDialogInfo(btnChangeName.getText().toString());
+                                                                   ShowDialogInfo((DeviceTag)btnChangeName.getTag());
                                                                    return true;
 
                                                                case R.id.PopUpRemote:
                                                                    //WipeDevices();
                                                                    ///PopUpOFF(btnChangeName.getText().toString());
-                                                                   ShowDialogRemote(btnChangeName.getText().toString());
+                                                                   //ShowDialogRemote(btnChangeName.getText().toString());
+                                                                   ShowDialogRemote((DeviceTag)btnChangeName.getTag());
                                                                    return true;
 
                                                                case R.id.PopUpRemove:
                                                                    //WipeDevices();
                                                                    ///PopUpOFF(btnChangeName.getText().toString());
-                                                                   ShowDialogRemove(btnChangeName.getText().toString());
+                                                                   //ShowDialogRemove(btnChangeName.getText().toString());
+                                                                   ShowDialogRemove((DeviceTag)btnChangeName.getTag());
                                                                    return true;
 
                                                                case R.id.action_settings:
@@ -905,7 +951,7 @@ public class MainActivity extends AppCompatActivity {
                     // will reset the device
                     Log.d("Settings Long press", btnChangeName.getText().toString());
 
-                   resetDeviceDialog(btnChangeName.getText().toString());
+                   //resetDeviceDialog(btnChangeName.getText().toString());
 
                     return true;
                 }
@@ -1006,14 +1052,15 @@ public class MainActivity extends AppCompatActivity {
             if (!LOGIN.equals("FALSE")) {
 
 
-                    //http://192.168.0.113/REMOTE?UserID=000002999
+                    //http://192.168.0.113/REMOTE?UserID=000002:999
                     Log.i("Pressed Remote 1 ", deviceKey +" "+ command);
 
                     if(command.equals("ON"))
                     {
                         //http://192.168.0.12/REMOTE?UserID=000001430
-                        Log.i("Pressed Remote 1 ",ip + "/REMOTE?UserID=" + NumericUserId + key);
-                        new HttpCommandRemote().execute(ip + "/REMOTE?UserID=" + NumericUserId + key);
+                       // Log.i("Pressed Remote 1 ",ip + "/REMOTE?UserID=" + NumericUserId + key);
+                        Log.i("Pressed Remote 1 ",ip + "/REMOTE?UserID=" + NumericUserId +":"+ key);
+                        new HttpCommandRemote().execute(ip + "/REMOTE?UserID=" + NumericUserId +":"+ key);
                     }else
                     {
                         Log.i("Pressed Remote 1 ",ip +"/NOREMOTE" );
@@ -1050,10 +1097,13 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void PopUpOn (String key){
+    private void PopUpOn (DeviceTag key){
 
         //In order to send an ON command, the device must be
         //check for wifi, if not on wifi, call connect to server button
+
+        DeviceTag dt1 = key;
+
 
         if(!wifiConected())
         {
@@ -1065,7 +1115,8 @@ public class MainActivity extends AppCompatActivity {
         if((isOnline() && serverConnection) || wifiConected())
         {
 
-            String[] arr = devices.get(key);
+            //String[] arr = devices.get(key);
+            String[] arr = devices.get(dt1.UUID);
             deviceKey = arr[1];
             deviceIp = arr[0];
             // put code on click operation
@@ -1103,7 +1154,9 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-    private void PopUpOFF(String key){
+   // private void PopUpOFF(String key){
+   private void PopUpOFF(DeviceTag key){
+
 
         if(!wifiConected())
         {
@@ -1113,7 +1166,7 @@ public class MainActivity extends AppCompatActivity {
         }
         if((isOnline() && serverConnection) || wifiConected()) {
 
-            String[] arr = devices.get(key);
+            String[] arr = devices.get(key.UUID);
             deviceKey = arr[1];
             deviceIp = arr[0];
             // put code on click operation
@@ -1378,21 +1431,22 @@ public class MainActivity extends AppCompatActivity {
     0.00833333333 / 0.000075
      */
 
-    private void ShowDialog(String key)
+   // private void ShowDialog(String key)
+    private void ShowDialog(DeviceTag key)
     {
         final int max = 120;
         int initalSeekBar = 0;
         final AlertDialog.Builder popDialog = new AlertDialog.Builder(this);
         final SeekBar seek = new SeekBar(this);
         seek.setMax(max);
-        final String deviceK = key;
+        final String deviceK = key.UUID;
 
         if(serverConnection == Boolean.FALSE) {
             //popDialog.setIcon(android.R.drawable.btn_star_big_on);
             popDialog.setTitle("Select Intensity");
             popDialog.setView(seek);
 
-            addresses = devices.get(key);
+            addresses = devices.get(deviceK);
             initalSeekBar = max - Integer.parseInt(addresses[2]);
 
             seek.setProgress(initalSeekBar);
@@ -1473,11 +1527,12 @@ public class MainActivity extends AppCompatActivity {
 
 
     /* Remove Device from the hashmap in app */
-    private void ShowDialogRemove(String key)
+    //private void ShowDialogRemove(String key)
+    private void ShowDialogRemove(DeviceTag key)
     {
         final AlertDialog.Builder popDialog = new AlertDialog.Builder(this);
 
-        final String deviceK = key;
+        final String deviceK = key.UUID;
 
         //popDialog.setIcon(android.R.drawable.btn_star_big_on);
         popDialog.setTitle("Remove Device?");
@@ -1510,11 +1565,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /*Dialog to manage set Remote Devices */
-    private void ShowDialogRemote(String key)
+    //private void ShowDialogRemote(String key)
+    private void ShowDialogRemote(DeviceTag key)
     {
         final AlertDialog.Builder popDialog = new AlertDialog.Builder(this);
 
-        String[] arr = devices.get(key);
+        String[] arr = devices.get(key.UUID);
         deviceKey = arr[1];
         deviceIp = arr[0];
 
@@ -1573,17 +1629,18 @@ public class MainActivity extends AppCompatActivity {
 
 
     /* Show device information on the APP */
-    private void ShowDialogInfo(String key)
+    //private void ShowDialogInfo(String key)
+    private void ShowDialogInfo(DeviceTag key)
     {
         final AlertDialog.Builder popDialog = new AlertDialog.Builder(this);
 
-        final String deviceK = key;
+        final String deviceK = key.UUID;
 
         //popDialog.setIcon(android.R.drawable.btn_star_big_on);
         popDialog.setTitle("Device Information");
 
 
-        addresses = devices.get(key);
+        addresses = devices.get(key.UUID);
 
         popDialog.setMessage("IP: " + addresses[0] + "\n" +
                 "Intensity: " + addresses[2] + "\n" +
@@ -1603,10 +1660,13 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void ChangeNameAlert(String device){
+    //private void ChangeNameAlert(String device){
+    private void ChangeNameAlert(DeviceTag device){
 
+        DeviceTag dt = device;
 
-        deviceNickName = device;
+        deviceNickName = dt.UUID;
+        deviceDisplayName = dt.name;
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Change Name");
 
@@ -1637,7 +1697,7 @@ public class MainActivity extends AppCompatActivity {
                     /*change name on device*/
                     String urlCommand = "/host?name=";
                     String[] info = devices.get(deviceNickName);
-                    //ip,key,dc
+                    //ip,key,dc,name
 
                     new HttpCommand().execute(info[0] + urlCommand + m_Text);
                     /*change name on hashmap*/
@@ -2019,7 +2079,7 @@ public class MainActivity extends AppCompatActivity {
                     //the app doesnt send the parameters if we are not logged in
                     if(!LOGIN.equals("FALSE"))
                     {
-                        new HttpCommand().execute(ipAdd + urlCommand + NumericUserId + convertedKey);
+                        new HttpCommand().execute(ipAdd + urlCommand + NumericUserId + ":"+convertedKey);
                     }
 
                     Toast.makeText(getBaseContext(),"Device Added", Toast.LENGTH_SHORT).show();
@@ -2339,7 +2399,7 @@ public class MainActivity extends AppCompatActivity {
         String result="";
 
         url = serverURL + "/?GetDevices="+ NumUserId;
-        Log.d("LoadDevices",url);
+        Log.i("LoadDevices",url);
        // result = GET4(url);
 
 
@@ -2380,17 +2440,19 @@ public class MainActivity extends AppCompatActivity {
 
         devices.clear();
 
+        Log.i("Load", UnparsedDevices);
 
         for (int i= 0;i < Devices.length -1;i++){
 
             params = Devices[i].split(",");
-            //Log.d("d", Integer.toString(params.length));
+            Log.i("Load", Integer.toString(params.length));
 
             String nickname = params[2];
             String key = params[0];
             String ip = params[1];
             String dc = "100";
             String[] values = {ip,key,dc};
+            //TODO here we need the new paramater
             devices.put(nickname, values);
 
 
@@ -2424,7 +2486,8 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String result) {
             Toast.makeText(getBaseContext(), "Received!", Toast.LENGTH_SHORT).show();
             //Toast.makeText(getBaseContext(), result, Toast.LENGTH_SHORT).show();
-            Log.d("Http Post Response:", result);
+            //Log.i("Http Post Response:", result);
+            Log.i("Load Devices:", result + result);
             SetDevices(result);
 
 
